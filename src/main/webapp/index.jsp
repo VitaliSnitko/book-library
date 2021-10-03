@@ -8,3 +8,5 @@
 <a href="<c:url value="/add"/>">Add book</a>
 </body>
 </html>
+
+<%--<c:url value="/add"/>--%>

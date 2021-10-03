@@ -1,8 +1,7 @@
-package com.itechart.book_library.dao;
+package com.itechart.book_library.dao.api;
 
-import com.itechart.book_library.domain.Entity;
+import com.itechart.book_library.entity.Entity;
 
-import java.sql.ResultSet;
 import java.util.List;
 
 public interface Dao<T extends Entity> {
@@ -11,7 +10,7 @@ public interface Dao<T extends Entity> {
 
     List<T> getAll();
 
-    List<T> getById(int id);
+    T getById(int id);
 
     void update(T entity);
 

@@ -1,5 +1,6 @@
-package com.itechart.book_library.domain;
+package com.itechart.book_library.entity;
 
+import java.io.InputStream;
 import java.sql.Date;
 
 public class Book extends Entity {
@@ -9,7 +10,7 @@ public class Book extends Entity {
     private int pageCount;
     private String ISBN;
     private String description;
-    private String cover;
+    private InputStream cover;
 
     public String getTitle() {
         return title;
@@ -59,11 +60,11 @@ public class Book extends Entity {
         this.description = description;
     }
 
-    public String getCover() {
+    public InputStream getCover() {
         return cover;
     }
 
-    public void setCover(String cover) {
+    public void setCover(InputStream cover) {
         this.cover = cover;
     }
 }

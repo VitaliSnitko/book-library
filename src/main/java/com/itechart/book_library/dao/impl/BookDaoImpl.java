@@ -1,43 +1,39 @@
 package com.itechart.book_library.dao.impl;
 
-import com.itechart.book_library.dao.Dao;
-import com.itechart.book_library.domain.Book;
+import com.itechart.book_library.dao.api.BaseDao;
+import com.itechart.book_library.dao.api.BookDao;
+import com.itechart.book_library.entity.Book;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookDaoImpl implements Dao<Book> {
+public class BookDaoImpl extends BaseDao implements BookDao {
 
-    private static final String CREATE = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String GET_ALL = "SELECT * FROM book";
-    private static final String GET_BY_ID = "SELECT * FROM book WHERE id = ?";
-    private static final String UPDATE = "UPDATE book SET title = ?, SET publisher = ?, SET publish_date = ?, SET page_count = ?, SET isbn = ?, SET description = ?, SET cover = ? WHERE id = ?";
-    private static final String DELETE = "DELETE FROM book WHERE id = ?";
-    private static final String GET_BY_TITLE = "SELECT * FROM book WHERE title = ?";
-    private static final String GET_BY_AUTHOR = "SELECT * FROM book JOIN author_book ON book.id = author_book.author_id WHERE author_id = ?";
-    private static final String GET_BY_GENRE = "SELECT * FROM book JOIN genre_book ON book.id = genre_book.genre_id WHERE genre_id = ?";
-    private static final String GET_BY_DESCRIPTION = "SELECT * FROM book WHERE description LIKE '%?%'";
-
-    private final Connection connection;
-
-    public BookDaoImpl(Connection connection) {
-        this.connection = connection;
-    }
+    private static final String INSERT_BOOK_QUERY = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SELECT_ALL_QUERY = "SELECT * FROM book";
+    private static final String SELECT_BY_ID_QUERY = "SELECT * FROM book WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE book SET title = ?, SET publisher = ?, SET publish_date = ?, SET page_count = ?, SET isbn = ?, SET description = ?, SET cover = ? WHERE id = ?";
+    private static final String DELETE_QUERY = "DELETE FROM book WHERE id = ?";
+    private static final String SELECT_BY_TITLE_QUERY = "SELECT * FROM book WHERE title = ?";
+    private static final String SELECT_BY_AUTHOR_QUERY = "SELECT * FROM book JOIN author_book ON book.id = author_book.author_id WHERE author_id = ?";
+    private static final String SELECT_BY_GENRE_QUERY = "SELECT * FROM book JOIN genre_book ON book.id = genre_book.genre_id WHERE genre_id = ?";
+    private static final String SELECT_BY_DESCRIPTION_QUERY = "SELECT * FROM book WHERE description LIKE '%?%'";
+    private static final String INSERT_AUTHOR_BOOK_QUERY = "INSERT INTO author_book (author_id, book_id) VALUES (?,?)";
+    private static final String INSERT_GENRE_BOOK_QUERY = "INSERT INTO genre_book (genre_id, book_id) VALUES (?,?)";
 
     @Override
     public Book create(Book book) {
-        try (PreparedStatement statement = connection.prepareStatement(CREATE)) {
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_BOOK_QUERY)) {
             statement.setString(1, book.getTitle());
             statement.setString(2, book.getPublisher());
             statement.setDate(3, book.getPublishDate());
             statement.setInt(4, book.getPageCount());
             statement.setString(5, book.getISBN());
             statement.setString(6, book.getDescription());
-            statement.setString(7, book.getCover());
+            statement.setBinaryStream(7, book.getCover());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -47,7 +43,7 @@ public class BookDaoImpl implements Dao<Book> {
 
     @Override
     public List<Book> getAll() {
-        try (PreparedStatement statement = connection.prepareStatement(GET_ALL)) {
+        try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_QUERY)) {
             return getListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,20 +52,20 @@ public class BookDaoImpl implements Dao<Book> {
     }
 
     @Override
-    public List<Book> getById(int id) {
-        return getListByKey(GET_BY_ID, id);
+    public Book getById(int id) {
+        return getListByKey(SELECT_BY_ID_QUERY, id).get(0);
     }
 
     @Override
     public void update(Book book) {
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
             statement.setString(1, book.getTitle());
             statement.setString(2, book.getPublisher());
             statement.setDate(3, book.getPublishDate());
             statement.setInt(4, book.getPageCount());
             statement.setString(5, book.getISBN());
             statement.setString(6, book.getDescription());
-            statement.setString(7, book.getCover());
+            statement.setBinaryStream(7, book.getCover());
             statement.setInt(8, book.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -79,31 +75,57 @@ public class BookDaoImpl implements Dao<Book> {
 
     @Override
     public void delete(int id) {
-        try (PreparedStatement statement = connection.prepareStatement(DELETE)) {
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
             statement.setInt(1, id);
             statement.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    public List<Book> getByTitle(String title) {
-        return getListByKey(GET_BY_TITLE, title);
+    @Override
+    public Book getByTitle(String title) {
+        return getListByKey(SELECT_BY_TITLE_QUERY, title).get(0);
     }
 
+    @Override
     public List<Book> getByAuthor(int id) {
-        return getListByKey(GET_BY_AUTHOR, id);
+        return getListByKey(SELECT_BY_AUTHOR_QUERY, id);
     }
 
+    @Override
     public List<Book> getByGenre(int id) {
-        return getListByKey(GET_BY_GENRE, id);
+        return getListByKey(SELECT_BY_GENRE_QUERY, id);
     }
 
+    @Override
     public List<Book> getByDescription(String description) {
-        return getListByKey(GET_BY_DESCRIPTION, description);
+        return getListByKey(SELECT_BY_DESCRIPTION_QUERY, description);
     }
 
-    private List<Book> getListByKey(String query, int id) {
+    @Override
+    public void setAuthorToBook(int authorId, int bookId) {
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_AUTHOR_BOOK_QUERY)) {
+            statement.setInt(1, authorId);
+            statement.setInt(2, bookId);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setGenreToBook(int genreId, int bookId) {
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_GENRE_BOOK_QUERY)) {
+            statement.setInt(1, genreId);
+            statement.setInt(2, bookId);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<Book> getListByKey(String query, int id){
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             return getListFromResultSet(statement.executeQuery());
@@ -135,7 +157,7 @@ public class BookDaoImpl implements Dao<Book> {
                 book.setPageCount(resultSet.getInt(5));
                 book.setISBN(resultSet.getString(6));
                 book.setDescription(resultSet.getString(7));
-                book.setCover(resultSet.getString(8));
+                book.setCover(resultSet.getBinaryStream(8));
                 books.add(book);
             }
         } catch (SQLException e) {

@@ -1,6 +1,6 @@
-package com.itechart.book_library.domain;
+package com.itechart.book_library.entity;
 
-public class Entity {
+public abstract class Entity {
     private int id;
 
     public int getId() {
