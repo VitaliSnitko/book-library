@@ -1,7 +1,7 @@
 package com.itechart.book_library.servlet;
 
-import com.itechart.book_library.entity.Book;
-import com.itechart.book_library.service.BookService;
+import com.itechart.book_library.model.dto.BookDto;
+import com.itechart.book_library.service.LibraryService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,28 +29,12 @@ public class LibraryServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        BookService bookService = new BookService();
-
-        String title       = req.getParameter("title");
-        String[] authors   = req.getParameter("authors").split(" *, *");
-        String[] genres    = req.getParameter("genres").split(" *, *");
-        String publisher   = req.getParameter("publisher");
-        System.out.println(req.getParameter("date"));
-        Date publishDate   = getDate(req.getParameter("date"));
-        Integer pageCount  = Integer.parseInt(req.getParameter("page count"));
-        String ISBN        = req.getParameter("ISBN");
-        String description = req.getParameter("description");
-        InputStream cover  = req.getPart("cover").getInputStream();
-        Book book = new Book();
-        book.setTitle(title);
-        book.setPublisher(publisher);
-        book.setPublishDate(publishDate);
-        book.setPageCount(pageCount);
-        book.setISBN(ISBN);
-        book.setDescription(description);
-        book.setCover(cover);
-        bookService.createBook(book, authors, genres);
-        resp.sendRedirect("/");
+        try {
+            LibraryService.getInstance().createBook(new BookDto(req));
+            resp.sendRedirect("/");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Date getDate(String date) {

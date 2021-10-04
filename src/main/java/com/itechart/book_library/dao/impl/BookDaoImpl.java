@@ -2,7 +2,7 @@ package com.itechart.book_library.dao.impl;
 
 import com.itechart.book_library.dao.api.BaseDao;
 import com.itechart.book_library.dao.api.BookDao;
-import com.itechart.book_library.entity.Book;
+import com.itechart.book_library.model.entity.Book;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class BookDaoImpl extends BaseDao implements BookDao {
 
-    private static final String INSERT_BOOK_QUERY = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_BOOK_QUERY = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
     private static final String SELECT_ALL_QUERY = "SELECT * FROM book";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM book WHERE id = ?";
     private static final String UPDATE_QUERY = "UPDATE book SET title = ?, SET publisher = ?, SET publish_date = ?, SET page_count = ?, SET isbn = ?, SET description = ?, SET cover = ? WHERE id = ?";
@@ -34,7 +34,8 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setString(5, book.getISBN());
             statement.setString(6, book.getDescription());
             statement.setBinaryStream(7, book.getCover());
-            statement.executeUpdate();
+            statement.execute();
+            book.setId(getIdAfterInserting(statement));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -47,6 +48,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             return getListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             e.printStackTrace();
+
         }
         return null;
     }
@@ -101,28 +103,6 @@ public class BookDaoImpl extends BaseDao implements BookDao {
     @Override
     public List<Book> getByDescription(String description) {
         return getListByKey(SELECT_BY_DESCRIPTION_QUERY, description);
-    }
-
-    @Override
-    public void setAuthorToBook(int authorId, int bookId) {
-        try (PreparedStatement statement = connection.prepareStatement(INSERT_AUTHOR_BOOK_QUERY)) {
-            statement.setInt(1, authorId);
-            statement.setInt(2, bookId);
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void setGenreToBook(int genreId, int bookId) {
-        try (PreparedStatement statement = connection.prepareStatement(INSERT_GENRE_BOOK_QUERY)) {
-            statement.setInt(1, genreId);
-            statement.setInt(2, bookId);
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     private List<Book> getListByKey(String query, int id){

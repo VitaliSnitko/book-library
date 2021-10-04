@@ -1,4 +1,4 @@
-package com.itechart.book_library.entity;
+package com.itechart.book_library.model.entity;
 
 public abstract class Entity {
     private int id;

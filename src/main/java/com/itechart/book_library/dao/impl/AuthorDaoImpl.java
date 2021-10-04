@@ -2,9 +2,7 @@ package com.itechart.book_library.dao.impl;
 
 import com.itechart.book_library.dao.api.AuthorDao;
 import com.itechart.book_library.dao.api.BaseDao;
-import com.itechart.book_library.dao.api.Dao;
-import com.itechart.book_library.entity.Author;
-import com.itechart.book_library.entity.Book;
+import com.itechart.book_library.model.entity.Author;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +12,7 @@ import java.util.List;
 
 public class AuthorDaoImpl extends BaseDao implements AuthorDao {
 
-    private static final String INSERT_QUERY = "INSERT INTO author (id, name) VALUES (DEFAULT, ?)";
+    private static final String INSERT_QUERY = "INSERT INTO author (id, name) VALUES (DEFAULT, ?) RETURNING id";
     private static final String SELECT_ALL_QUERY = "SELECT * FROM author";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM author WHERE id = ?";
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM author WHERE name = ?";
@@ -25,7 +23,8 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
     public Author create(Author author) {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
             statement.setString(1, author.getName());
-            statement.executeUpdate();
+            statement.execute();
+            author.setId(getIdAfterInserting(statement));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -106,4 +105,6 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
         }
         return authors;
     }
+
+
 }

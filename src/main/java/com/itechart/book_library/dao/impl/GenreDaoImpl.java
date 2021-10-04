@@ -1,10 +1,8 @@
 package com.itechart.book_library.dao.impl;
 
 import com.itechart.book_library.dao.api.BaseDao;
-import com.itechart.book_library.dao.api.Dao;
 import com.itechart.book_library.dao.api.GenreDao;
-import com.itechart.book_library.entity.Author;
-import com.itechart.book_library.entity.Genre;
+import com.itechart.book_library.model.entity.Genre;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +12,7 @@ import java.util.List;
 
 public class GenreDaoImpl extends BaseDao implements GenreDao {
 
-    private static final String INSERT_QUERY = "INSERT INTO genre (id, name) VALUES (DEFAULT, ?)";
+    private static final String INSERT_QUERY = "INSERT INTO genre (id, name) VALUES (DEFAULT, ?) RETURNING id";
     private static final String SELECT_ALL_QUERY = "SELECT * FROM genre";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM genre WHERE id = ?";
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM genre WHERE name = ?";
@@ -25,7 +23,8 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     public Genre create(Genre genre) {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
             statement.setString(1, genre.getName());
-            statement.executeUpdate();
+            statement.execute();
+            genre.setId(getIdAfterInserting(statement));
         } catch (SQLException e) {
             e.printStackTrace();
         }

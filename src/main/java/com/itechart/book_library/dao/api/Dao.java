@@ -1,6 +1,6 @@
 package com.itechart.book_library.dao.api;
 
-import com.itechart.book_library.entity.Entity;
+import com.itechart.book_library.model.entity.Entity;
 
 import java.util.List;
 

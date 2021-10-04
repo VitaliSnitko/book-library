@@ -1,12 +1,12 @@
-package com.itechart.book_library.entity;
+package com.itechart.book_library.model.entity;
 
-public class Genre extends Entity {
+public class Author extends Entity{
     private String name;
 
-    public Genre() {
+    public Author() {
     }
 
-    public Genre(String name) {
+    public Author(String name) {
         this.name = name;
     }
 
