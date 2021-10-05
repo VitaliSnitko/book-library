@@ -21,8 +21,6 @@ public class BookDaoImpl extends BaseDao implements BookDao {
     private static final String SELECT_BY_AUTHOR_QUERY = "SELECT * FROM book JOIN author_book ON book.id = author_book.author_id WHERE author_id = ?";
     private static final String SELECT_BY_GENRE_QUERY = "SELECT * FROM book JOIN genre_book ON book.id = genre_book.genre_id WHERE genre_id = ?";
     private static final String SELECT_BY_DESCRIPTION_QUERY = "SELECT * FROM book WHERE description LIKE '%?%'";
-    private static final String INSERT_AUTHOR_BOOK_QUERY = "INSERT INTO author_book (author_id, book_id) VALUES (?,?)";
-    private static final String INSERT_GENRE_BOOK_QUERY = "INSERT INTO genre_book (genre_id, book_id) VALUES (?,?)";
 
     @Override
     public Book create(Book book) {
@@ -48,7 +46,6 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             return getListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
         return null;
     }

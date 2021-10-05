@@ -2,6 +2,7 @@ package com.itechart.book_library.dao.impl;
 
 import com.itechart.book_library.dao.api.BaseDao;
 import com.itechart.book_library.dao.api.GenreDao;
+import com.itechart.book_library.model.entity.Author;
 import com.itechart.book_library.model.entity.Genre;
 
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM genre WHERE name = ?";
     private static final String UPDATE_QUERY = "UPDATE genre SET name = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM genre WHERE id = ?";
+    private static final String SELECT_BY_BOOK_ID_QUERY = "SELECT * FROM genre JOIN genre_book ON genre.id = genre_book.genre_id JOIN book ON genre_book.book_id = book.id WHERE book_id = ?";
 
     @Override
     public Genre create(Genre genre) {
@@ -69,6 +71,11 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     @Override
     public Genre getByName(String name) {
         return getListByKey(SELECT_BY_NAME_QUERY, name).get(0);
+    }
+
+    @Override
+    public List<Genre> getByBookId(int id) {
+        return getListByKey(SELECT_BY_BOOK_ID_QUERY, id);
     }
 
     private List<Genre> getListByKey(String query, int id){

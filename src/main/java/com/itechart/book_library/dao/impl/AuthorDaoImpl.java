@@ -18,6 +18,7 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM author WHERE name = ?";
     private static final String UPDATE_QUERY = "UPDATE author SET name = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM author WHERE id = ?";
+    private static final String SELECT_BY_BOOK_ID_QUERY = "SELECT * FROM author JOIN author_book ON author.id = author_book.author_id JOIN book ON author_book.book_id = book.id WHERE book_id = ?";
 
     @Override
     public Author create(Author author) {
@@ -69,6 +70,11 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
     @Override
     public Author getByName(String name) {
         return getListByKey(SELECT_BY_NAME_QUERY, name).get(0);
+    }
+
+    @Override
+    public List<Author> getByBookId(int id) {
+        return getListByKey(SELECT_BY_BOOK_ID_QUERY, id);
     }
 
     private List<Author> getListByKey(String query, int id){

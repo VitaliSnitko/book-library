@@ -6,7 +6,10 @@
 </head>
 <body>
 <a href="<c:url value="/add"/>">Add book</a>
+<div>
+    <c:forEach var="bookDto" items="${requestScope.bookList}">
+        <li><c:out value="${bookDto.title}"/></li>
+    </c:forEach>
+</div>
 </body>
 </html>
-
-<%--<c:url value="/add"/>--%>

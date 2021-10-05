@@ -8,6 +8,9 @@ import com.itechart.book_library.model.entity.Author;
 import com.itechart.book_library.model.entity.Book;
 import com.itechart.book_library.model.entity.Genre;
 
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LibraryService {
@@ -24,15 +27,15 @@ public class LibraryService {
 
     public void createBook(BookDto bookDto) throws DaoException {
 
-        BookDao bookDao = DaoFactory.getInstance().getDao(BookDaoImpl.class);
-        AuthorDao authorDao = DaoFactory.getInstance().getDao(AuthorDaoImpl.class);
-        GenreDao genreDao = DaoFactory.getInstance().getDao(GenreDaoImpl.class);
-        AuthorBookDaoImpl authorBookDao = DaoFactory.getInstance().getDao(AuthorBookDaoImpl.class);
-        GenreBookDaoImpl genreBookDao = DaoFactory.getInstance().getDao(GenreBookDaoImpl.class);
+        BookDao bookDao = getDaoFactory().getDao(BookDaoImpl.class);
+        AuthorDao authorDao = getDaoFactory().getDao(AuthorDaoImpl.class);
+        GenreDao genreDao = getDaoFactory().getDao(GenreDaoImpl.class);
+        AuthorBookDaoImpl authorBookDao = getDaoFactory().getDao(AuthorBookDaoImpl.class);
+        GenreBookDaoImpl genreBookDao = getDaoFactory().getDao(GenreBookDaoImpl.class);
 
         Book book = bookDto.convertBookDtoToBookEntity();
-        List<Author> listOfAuthors = bookDto.convertBookDtoToListOfAuthors();
-        List<Genre> listOfGenres = bookDto.convertBookDtoToListOfGenres();
+        List<Author> listOfAuthors = bookDto.getListOfAuthors();
+        List<Genre> listOfGenres = bookDto.getListOfGenres();
 
         bookDao.create(book);
         for (Author author : listOfAuthors) {
@@ -44,6 +47,29 @@ public class LibraryService {
             genreBookDao.setGenreToBook(genre.getId(), book.getId());
         }
 
+    }
+
+    public List<BookDto> getAll() throws DaoException, ServletException, IOException {
+        BookDao bookDao = getDaoFactory().getDao(BookDaoImpl.class);
+        AuthorDao authorDao = getDaoFactory().getDao(AuthorDaoImpl.class);
+        GenreDao genreDao = getDaoFactory().getDao(GenreDaoImpl.class);
+
+        List<BookDto> bookDtoList = new ArrayList<>();
+        List<Book> listOfBooks = bookDao.getAll();
+
+        for (Book book : listOfBooks) {
+            List<Author> listOfAuthors = authorDao.getByBookId(book.getId());
+            List<Genre> listOfGenres = genreDao.getByBookId(book.getId());
+            bookDtoList.add(new BookDto(book, listOfAuthors, listOfGenres));
+        }
+
+        return bookDtoList;
+    }
+
+    private DaoFactory getDaoFactory() {
+        try(DaoFactory daoFactory = new DaoFactory()) {
+            return daoFactory;
+        }
     }
 
 }

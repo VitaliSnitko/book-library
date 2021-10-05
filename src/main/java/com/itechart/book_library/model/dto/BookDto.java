@@ -26,6 +26,18 @@ public class BookDto {
     private String description;
     private InputStream cover;
 
+    public BookDto(Book book, List<Author> authorList, List<Genre> genreList) {
+        title       = book.getTitle();
+        authors     = authorList.stream().map(Author::getName).toArray(String[]::new);
+        genres      = genreList.stream().map(Genre::getName).toArray(String[]::new);
+        publisher   = book.getPublisher();
+        publishDate = book.getPublishDate();
+        pageCount   = book.getPageCount();
+        ISBN        = book.getISBN();
+        description = book.getDescription();
+        cover       = book.getCover();
+    }
+
     public BookDto(HttpServletRequest req) throws ServletException, IOException {
         title       = req.getParameter("title");
         authors     = req.getParameter("authors").split(" *, *");
@@ -50,7 +62,7 @@ public class BookDto {
         return book;
     }
 
-    public List<Author> convertBookDtoToListOfAuthors() {
+    public List<Author> getListOfAuthors() {
         List<Author> listOfAuthors = new ArrayList<>();
         for (String authorName : authors) {
             listOfAuthors.add(new Author(authorName));
@@ -58,7 +70,7 @@ public class BookDto {
         return listOfAuthors;
     }
 
-    public List<Genre> convertBookDtoToListOfGenres() {
+    public List<Genre> getListOfGenres() {
         List<Genre> listOfGenres = new ArrayList<>();
         for (String genreName : genres) {
             listOfGenres.add(new Genre(genreName));
@@ -76,5 +88,39 @@ public class BookDto {
         return new java.sql.Date(utilDate.getTime());
     }
 
+    public String getTitle() {
+        return title;
+    }
 
+    public String[] getAuthors() {
+        return authors;
+    }
+
+    public String[] getGenres() {
+        return genres;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public Date getPublishDate() {
+        return publishDate;
+    }
+
+    public int getPageCount() {
+        return pageCount;
+    }
+
+    public String getISBN() {
+        return ISBN;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public InputStream getCover() {
+        return cover;
+    }
 }
