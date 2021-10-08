@@ -33,8 +33,7 @@ public class ConnectionPool {
     private void loadDBProperties() {
         Properties properties = new Properties();
         try {
-            File file = new File("C:\\Users\\Vit\\IdeaProjects\\book-library\\src\\main\\resources\\database.properties");
-            properties.load(new FileReader(file));
+            properties.load(getClass().getClassLoader().getResourceAsStream("database.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,17 +81,4 @@ public class ConnectionPool {
         }
     }
 
-    public void closeAllConnections() {
-        closeAllConnectionInQueue(connections);
-    }
-
-    private void closeAllConnectionInQueue(BlockingQueue<Connection> connections) {
-        for (Connection connection : connections) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

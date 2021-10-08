@@ -3,7 +3,7 @@ package com.itechart.book_library.model.entity;
 import java.io.InputStream;
 import java.sql.Date;
 
-public class Book extends Entity {
+public class BookEntity extends Entity {
     private String title;
     private String publisher;
     private Date publishDate;

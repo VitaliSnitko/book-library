@@ -11,40 +11,34 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.sql.SQLException;
 
-@WebServlet("/add")
+@WebServlet("/edit")
 @MultipartConfig
-public class LibraryServlet extends HttpServlet {
+public class BookViewEditServlet extends HttpServlet {
 
     public static RequestDispatcher requestDispatcher;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        requestDispatcher = req.getRequestDispatcher("WEB-INF/jsp/add.jsp");
+        BookDto bookDto = null;
+        try {
+            bookDto = LibraryService.getInstance().getById(Integer.parseInt(req.getParameter("id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        req.setAttribute("bookDto", bookDto);
+        requestDispatcher = req.getRequestDispatcher("WEB-INF/jsp/book-page-edit.jsp");
         requestDispatcher.forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         try {
-            LibraryService.getInstance().createBook(new BookDto(req));
+            LibraryService.getInstance().update(new BookDto(req));
             resp.sendRedirect("/");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    private Date getDate(String date) {
-        java.util.Date utilDate = null;
-        try {
-            utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return new java.sql.Date(utilDate.getTime());
-    }
-
 }

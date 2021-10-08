@@ -1,12 +1,14 @@
 package com.itechart.book_library.dao.api;
 
-import com.itechart.book_library.model.entity.Book;
+import com.itechart.book_library.model.entity.BookEntity;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
-public interface BookDao extends Dao<Book>{
-    public Book getByTitle(String title);
-    public List<Book> getByAuthor(int id);
-    public List<Book> getByGenre(int id);
-    public List<Book> getByDescription(String description);
+public interface BookDao extends Dao<BookEntity>{
+    Optional<BookEntity> getByTitle(String title) throws SQLException;
+    List<BookEntity> getByAuthor(int id) throws SQLException;
+    List<BookEntity> getByGenre(int id) throws SQLException;
+    List<BookEntity> getByDescription(String description) throws SQLException;
 }

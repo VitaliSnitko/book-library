@@ -1,7 +1,6 @@
 package com.itechart.book_library.model.dto;
 
 import com.itechart.book_library.model.entity.Author;
-import com.itechart.book_library.model.entity.Book;
 
 public class AuthorDto {
     private String name;
