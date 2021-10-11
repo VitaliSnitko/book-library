@@ -1,7 +1,6 @@
 package com.itechart.book_library.model.dto;
 
-import com.itechart.book_library.model.entity.Author;
-import com.itechart.book_library.model.entity.Genre;
+import com.itechart.book_library.model.entity.GenreEntity;
 
 public class GenreDto {
     private String name;
@@ -10,9 +9,7 @@ public class GenreDto {
         this.name = name;
     }
 
-    public Genre convertGenreDtoToGenreEntity() {
-        Genre genre = new Genre();
-        genre.setName(name);
-        return genre;
+    public String getName() {
+        return name;
     }
 }

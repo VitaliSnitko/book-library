@@ -12,6 +12,20 @@ public class BookEntity extends Entity {
     private String description;
     private InputStream cover;
 
+    public BookEntity() {
+    }
+
+    public BookEntity(int id, String title, String publisher, Date publishDate, int pageCount, String ISBN, String description, InputStream cover) {
+        super(id);
+        this.title = title;
+        this.publisher = publisher;
+        this.publishDate = publishDate;
+        this.pageCount = pageCount;
+        this.ISBN = ISBN;
+        this.description = description;
+        this.cover = cover;
+    }
+
     public String getTitle() {
         return title;
     }

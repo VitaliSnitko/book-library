@@ -1,8 +1,5 @@
 package com.itechart.book_library.model.dto;
 
-import com.itechart.book_library.model.entity.Author;
-import com.itechart.book_library.model.entity.BookEntity;
-import com.itechart.book_library.model.entity.Genre;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
@@ -12,17 +9,17 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.sql.Date;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.zip.InflaterOutputStream;
+import java.util.stream.Collectors;
 
 public class BookDto {
 
     private int id;
     private String title;
-    String[] authors;
-    String[] genres;
+    List<AuthorDto> authorDtos;
+    List<GenreDto> genreDtos;
     private String publisher;
     private Date publishDate;
     private int pageCount;
@@ -31,21 +28,18 @@ public class BookDto {
     private InputStream cover;
     private String base64Cover;
 
-    public BookDto(BookEntity book, List<Author> authorList, List<Genre> genreList) {
-        id          = book.getId();
-        title       = book.getTitle();
-        authors     = authorList.stream().map(Author::getName).toArray(String[]::new);
-        genres      = genreList.stream().map(Genre::getName).toArray(String[]::new);
-        publisher   = book.getPublisher();
-        publishDate = book.getPublishDate();
-        pageCount   = book.getPageCount();
-        ISBN        = book.getISBN();
-        description = book.getDescription();
-        cover       = book.getCover();
+    public BookDto(int id, String title, String publisher, Date publishDate,
+                   int pageCount, String ISBN, String description, InputStream cover) {
+        this.id = id;
+        this.title = title;
+        this.publisher = publisher;
+        this.publishDate = publishDate;
+        this.pageCount = pageCount;
+        this.ISBN = ISBN;
+        this.description = description;
+        this.cover = cover;
         try {
-            base64Cover = (cover == null)
-                    ? Base64.getEncoder().encodeToString(new byte[0])
-                    : Base64.getEncoder().encodeToString(IOUtils.toByteArray(cover));
+            base64Cover = (cover == null) ? "" : Base64.getEncoder().encodeToString(IOUtils.toByteArray(cover));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,8 +49,12 @@ public class BookDto {
         if (req.getParameter("id") != null)
         id          = Integer.parseInt(req.getParameter("id"));
         title       = req.getParameter("title");
-        authors     = req.getParameter("authors").split(" *, *");
-        genres      = req.getParameter("genres").split(" *, *");
+        authorDtos = Arrays.stream(req.getParameter("authors").split(" *, *"))
+                .map(AuthorDto::new)
+                .collect(Collectors.toList());
+        genreDtos = Arrays.stream(req.getParameter("genres").split(" *, *"))
+                .map(GenreDto::new)
+                .collect(Collectors.toList());
         publisher   = req.getParameter("publisher");
         publishDate = getDate(req.getParameter("date"));
         pageCount   = Integer.parseInt(req.getParameter("page count"));
@@ -64,38 +62,6 @@ public class BookDto {
         description = req.getParameter("description");
         cover       = req.getPart("cover").getInputStream();
         if (cover.available() == 0) cover = null;
-    }
-
-    public BookDto() {
-    }
-
-    public BookEntity convertBookDtoToBookEntity() {
-        BookEntity book = new BookEntity();
-        book.setId(id);
-        book.setTitle(title);
-        book.setPublisher(publisher);
-        book.setPublishDate(publishDate);
-        book.setPageCount(pageCount);
-        book.setISBN(ISBN);
-        book.setDescription(description);
-        book.setCover(cover);
-        return book;
-    }
-
-    public List<Author> getListOfAuthors() {
-        List<Author> authorList = new ArrayList<>();
-        for (String authorName : this.authors) {
-            authorList.add(new Author(authorName));
-        }
-        return authorList;
-    }
-
-    public List<Genre> getListOfGenres() {
-        List<Genre> listOfGenres = new ArrayList<>();
-        for (String genreName : genres) {
-            listOfGenres.add(new Genre(genreName));
-        }
-        return listOfGenres;
     }
 
     private Date getDate(String stringDate) {
@@ -108,20 +74,28 @@ public class BookDto {
         return new java.sql.Date(utilDate.getTime());
     }
 
+    public List<AuthorDto> getAuthorDtos() {
+        return authorDtos;
+    }
+
+    public void setAuthorDtos(List<AuthorDto> authorEntities) {
+        this.authorDtos = authorEntities;
+    }
+
+    public List<GenreDto> getGenreDtos() {
+        return genreDtos;
+    }
+
+    public void setGenreDtos(List<GenreDto> genreEntities) {
+        this.genreDtos = genreEntities;
+    }
+
     public int getId() {
         return id;
     }
 
     public String getTitle() {
         return title;
-    }
-
-    public String[] getAuthors() {
-        return authors;
-    }
-
-    public String[] getGenres() {
-        return genres;
     }
 
     public String getPublisher() {

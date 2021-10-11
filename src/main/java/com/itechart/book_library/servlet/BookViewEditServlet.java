@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet("/edit")
+//@WebServlet("/edit")
 @MultipartConfig
 public class BookViewEditServlet extends HttpServlet {
 
@@ -28,7 +28,7 @@ public class BookViewEditServlet extends HttpServlet {
             e.printStackTrace();
         }
         req.setAttribute("bookDto", bookDto);
-        requestDispatcher = req.getRequestDispatcher("WEB-INF/jsp/book-page-edit.jsp");
+        requestDispatcher = req.getRequestDispatcher("WEB-INF/jsp/edit.jsp");
         requestDispatcher.forward(req, resp);
     }
 

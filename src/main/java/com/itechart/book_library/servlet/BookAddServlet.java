@@ -15,7 +15,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-@WebServlet("/add")
+//@WebServlet("/add")
 @MultipartConfig
 public class BookAddServlet extends HttpServlet {
 
@@ -35,16 +35,6 @@ public class BookAddServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private Date getDate(String date) {
-        java.util.Date utilDate = null;
-        try {
-            utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return new java.sql.Date(utilDate.getTime());
     }
 
 }

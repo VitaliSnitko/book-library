@@ -13,14 +13,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("")
+//@WebServlet("")
 public class MainPageServlet extends HttpServlet {
 
     public static RequestDispatcher requestDispatcher;
     //LibraryService getInstance
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        System.out.println(req.getPathInfo());
         List<BookDto> bookDtoList = null;
         try {
             bookDtoList = LibraryService.getInstance().getAll();

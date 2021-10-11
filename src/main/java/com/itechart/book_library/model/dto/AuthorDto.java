@@ -1,6 +1,6 @@
 package com.itechart.book_library.model.dto;
 
-import com.itechart.book_library.model.entity.Author;
+import com.itechart.book_library.model.entity.AuthorEntity;
 
 public class AuthorDto {
     private String name;
@@ -9,9 +9,7 @@ public class AuthorDto {
         this.name = name;
     }
 
-    public Author convertAuthorDtoToAuthorEntity() {
-        Author author = new Author();
-        author.setName(name);
-        return author;
+    public String getName() {
+        return name;
     }
 }

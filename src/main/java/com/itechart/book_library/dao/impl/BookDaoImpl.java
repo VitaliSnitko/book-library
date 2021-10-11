@@ -26,13 +26,14 @@ public class BookDaoImpl extends BaseDao implements BookDao {
     @Override
     public BookEntity create(BookEntity book) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_BOOK_QUERY)) {
-            statement.setString(1, book.getTitle());
-            statement.setString(2, book.getPublisher());
-            statement.setDate(3, book.getPublishDate());
-            statement.setInt(4, book.getPageCount());
-            statement.setString(5, book.getISBN());
-            statement.setString(6, book.getDescription());
-            statement.setBinaryStream(7, book.getCover());
+            int i = 1;
+            statement.setString(i++, book.getTitle());
+            statement.setString(i++, book.getPublisher());
+            statement.setDate(i++, book.getPublishDate());
+            statement.setInt(i++, book.getPageCount());
+            statement.setString(i++, book.getISBN());
+            statement.setString(i++, book.getDescription());
+            statement.setBinaryStream(i, book.getCover());
             statement.execute();
             book.setId(getIdAfterInserting(statement));
         }
@@ -55,14 +56,15 @@ public class BookDaoImpl extends BaseDao implements BookDao {
     @Override
     public void update(BookEntity book) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
-            statement.setString(1, book.getTitle());
-            statement.setString(2, book.getPublisher());
-            statement.setDate(3, book.getPublishDate());
-            statement.setInt(4, book.getPageCount());
-            statement.setString(5, book.getISBN());
-            statement.setString(6, book.getDescription());
-            statement.setBinaryStream(7, book.getCover());
-            statement.setInt(8, book.getId());
+            int i = 1;
+            statement.setString(i++, book.getTitle());
+            statement.setString(i++, book.getPublisher());
+            statement.setDate(i++, book.getPublishDate());
+            statement.setInt(i++, book.getPageCount());
+            statement.setString(i++, book.getISBN());
+            statement.setString(i++, book.getDescription());
+            statement.setBinaryStream(i++, book.getCover());
+            statement.setInt(i, book.getId());
             statement.executeUpdate();
         }
     }
