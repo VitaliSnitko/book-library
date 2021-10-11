@@ -4,6 +4,7 @@ import com.itechart.book_library.dao.api.BaseDao;
 import com.itechart.book_library.dao.api.BookDao;
 import com.itechart.book_library.model.entity.BookEntity;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +26,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
     @Override
     public BookEntity create(BookEntity book) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(INSERT_BOOK_QUERY)) {
             int i = 1;
             statement.setString(i++, book.getTitle());
@@ -36,14 +38,19 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setBinaryStream(i, book.getCover());
             statement.execute();
             book.setId(getIdAfterInserting(statement));
+        } finally {
+            connectionPool.removeToPool(connection);
         }
         return book;
     }
 
     @Override
     public List<BookEntity> getAll() throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_QUERY)) {
             return getListFromResultSet(statement.executeQuery());
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
@@ -55,6 +62,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
     @Override
     public void update(BookEntity book) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
             int i = 1;
             statement.setString(i++, book.getTitle());
@@ -66,14 +74,19 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setBinaryStream(i++, book.getCover());
             statement.setInt(i, book.getId());
             statement.executeUpdate();
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
     @Override
     public void delete(int id) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
             statement.setInt(1, id);
             statement.executeUpdate();
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
@@ -99,16 +112,22 @@ public class BookDaoImpl extends BaseDao implements BookDao {
     }
 
     private List<BookEntity> getListByKey(String query, int id) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             return getListFromResultSet(statement.executeQuery());
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
     private List<BookEntity> getListByKey(String query, String text) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, text);
             return getListFromResultSet(statement.executeQuery());
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 

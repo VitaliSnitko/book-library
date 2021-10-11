@@ -15,19 +15,10 @@ public class DaoConnectionProvider implements AutoCloseable {
         connection = connectionPool.getConnection();
     }
 
-    public <T extends BaseDao> T getDao(Class<T> clazz) {
-        T t = null;
-        try {
-            t = clazz.getDeclaredConstructor().newInstance();
-            t.setConnection(connection);
-        } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return t;
-    }
+
 
     @Override
     public void close() {
-        connectionPool.closeConnection(connection);
+        connectionPool.removeToPool(connection);
     }
 }

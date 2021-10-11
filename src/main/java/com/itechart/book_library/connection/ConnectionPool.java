@@ -73,7 +73,7 @@ public class ConnectionPool {
         return currentConnection;
     }
 
-    public void closeConnection(Connection connection) {
+    public void removeToPool(Connection connection) {
         try {
             connections.put(connection);
         } catch (InterruptedException e) {

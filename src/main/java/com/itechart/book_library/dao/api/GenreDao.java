@@ -11,5 +11,4 @@ public interface GenreDao extends Dao<GenreEntity> {
     Optional<GenreEntity> getById(int id) throws SQLException;
     Optional<GenreEntity> getByName(String name) throws SQLException;
     List<GenreEntity> getByBookId(int id) throws SQLException;
-    List<GenreEntity> getByBookList(List<BookEntity> bookEntityList) throws SQLException;
 }

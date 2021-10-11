@@ -5,6 +5,7 @@ import com.itechart.book_library.dao.api.GenreDao;
 import com.itechart.book_library.model.entity.BookEntity;
 import com.itechart.book_library.model.entity.GenreEntity;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,23 +22,27 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private static final String UPDATE_QUERY = "UPDATE genre SET name = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM genre WHERE id = ?";
     private static final String SELECT_BY_BOOK_ID_QUERY = "SELECT * FROM genre JOIN genre_book ON genre.id = genre_book.genre_id JOIN book ON genre_book.book_id = book.id WHERE book_id = ?";
-    private static final String TEMPLATE_FOR_SELECT_BY_BOOK_IDS_QUERY = "SELECT * FROM genre JOIN genre_book ON genre.id = genre_book.genre_id JOIN book ON genre_book.book_id = book.id WHERE book_id IN(?";
-    private static String SELECT_BY_BOOK_IDS_QUERY = TEMPLATE_FOR_SELECT_BY_BOOK_IDS_QUERY;
 
     @Override
     public GenreEntity create(GenreEntity genreEntity) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
             statement.setString(1, genreEntity.getName());
             statement.execute();
             genreEntity.setId(getIdAfterInserting(statement));
+        } finally {
+            connectionPool.removeToPool(connection);
         }
         return genreEntity;
     }
 
     @Override
     public List<GenreEntity> getAll() throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_QUERY)) {
             return getListFromResultSet(statement.executeQuery());
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
@@ -49,17 +54,23 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
 
     @Override
     public void update(GenreEntity genreEntity) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
             statement.setString(1, genreEntity.getName());
             statement.executeUpdate();
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
     @Override
     public void delete(int id) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
             statement.setInt(1, id);
             statement.executeUpdate();
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
@@ -74,33 +85,24 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
         return getListByKey(SELECT_BY_BOOK_ID_QUERY, id);
     }
 
-    @Override
-    public List<GenreEntity> getByBookList(List<BookEntity> bookEntityList) throws SQLException {
-        for (int i = 1; i < bookEntityList.size(); i++) {
-            SELECT_BY_BOOK_IDS_QUERY += ", ?";
-        }
-        SELECT_BY_BOOK_IDS_QUERY += ")";
-
-        try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_BOOK_IDS_QUERY)) {
-            for (int i = 0; i < bookEntityList.size(); i++) {
-                statement.setInt(i+1, bookEntityList.get(i).getId());
-            }
-            SELECT_BY_BOOK_IDS_QUERY = TEMPLATE_FOR_SELECT_BY_BOOK_IDS_QUERY;
-            return getListFromResultSet(statement.executeQuery());
-        }
-    }
 
     private List<GenreEntity> getListByKey(String query, int id) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             return getListFromResultSet(statement.executeQuery());
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
     private List<GenreEntity> getListByKey(String query, String text) throws SQLException {
+        Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, text);
             return getListFromResultSet(statement.executeQuery());
+        } finally {
+            connectionPool.removeToPool(connection);
         }
     }
 
