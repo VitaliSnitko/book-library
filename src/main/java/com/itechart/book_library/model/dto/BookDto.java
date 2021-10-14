@@ -1,5 +1,7 @@
 package com.itechart.book_library.model.dto;
 
+import com.itechart.book_library.model.entity.AuthorEntity;
+import com.itechart.book_library.model.entity.GenreEntity;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
@@ -28,10 +30,13 @@ public class BookDto {
     private InputStream cover;
     private String base64Cover;
 
-    public BookDto(int id, String title, String publisher, Date publishDate,
-                   int pageCount, String ISBN, String description, InputStream cover) {
+    public BookDto(int id, String title, List<AuthorDto> authorDtos, List<GenreDto> genreDtos,
+                   String publisher, Date publishDate, int pageCount, String ISBN, String description, InputStream cover) {
         this.id = id;
         this.title = title;
+        this.authorDtos = authorDtos;
+        this.genreDtos = genreDtos;
+
         this.publisher = publisher;
         this.publishDate = publishDate;
         this.pageCount = pageCount;

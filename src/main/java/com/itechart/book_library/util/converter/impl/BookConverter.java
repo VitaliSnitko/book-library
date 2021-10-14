@@ -6,7 +6,8 @@ import com.itechart.book_library.util.converter.Converter;
 
 
 public class BookConverter extends Converter<BookDto, BookEntity> {
-
+    private static AuthorConverter authorConverter = new AuthorConverter();
+    private static GenreConverter genreConverter = new GenreConverter();
     public BookConverter() {
         super(BookConverter::convertToEntity, BookConverter::convertToDto);
     }
@@ -15,6 +16,8 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
         return new BookDto(
                 bookEntity.getId(),
                 bookEntity.getTitle(),
+                authorConverter.toDtos(bookEntity.getAuthorEntities()),
+                genreConverter.toDtos(bookEntity.getGenreEntities()),
                 bookEntity.getPublisher(),
                 bookEntity.getPublishDate(),
                 bookEntity.getPageCount(),
@@ -27,6 +30,8 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
         return new BookEntity(
                 bookDto.getId(),
                 bookDto.getTitle(),
+                authorConverter.toEntities(bookDto.getAuthorDtos()),
+                genreConverter.toEntities(bookDto.getGenreDtos()),
                 bookDto.getPublisher(),
                 bookDto.getPublishDate(),
                 bookDto.getPageCount(),
@@ -34,6 +39,4 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
                 bookDto.getDescription(),
                 bookDto.getCover());
     }
-
-
 }

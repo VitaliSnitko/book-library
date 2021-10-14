@@ -12,7 +12,7 @@ public class ConnectionPool {
 
     private static ConnectionPool connectionPool;
 
-    private BlockingQueue<Connection> connections = null;
+    private BlockingQueue<Connection> connections;
     private String url;
     private String username;
     private String password;
@@ -73,7 +73,7 @@ public class ConnectionPool {
         return currentConnection;
     }
 
-    public void removeToPool(Connection connection) {
+    public void returnToPool(Connection connection) {
         try {
             connections.put(connection);
         } catch (InterruptedException e) {

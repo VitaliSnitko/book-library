@@ -8,14 +8,12 @@ import java.util.Optional;
 
 public interface Dao<T extends Entity> {
 
-    T create(T entity) throws SQLException;
+    T create(T entity);
 
-    List<T> getAll() throws SQLException;
+    Optional<T> getById(int id);
 
-    Optional<T> getById(int id) throws SQLException;
+    void update(T entity);
 
-    void update(T entity) throws SQLException;
-
-    void delete(int id) throws SQLException;
+    void delete(Integer[] ids);
 
 }

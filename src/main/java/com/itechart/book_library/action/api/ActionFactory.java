@@ -2,28 +2,29 @@ package com.itechart.book_library.action.api;
 
 import com.itechart.book_library.action.get.BookAddPageAction;
 import com.itechart.book_library.action.get.BookEditPageAction;
-import com.itechart.book_library.action.get.MainPageAction;
+import com.itechart.book_library.action.get.BookListAction;
 import com.itechart.book_library.action.post.BookAddAction;
+import com.itechart.book_library.action.post.BookDeleteAction;
 import com.itechart.book_library.action.post.BookEditAction;
-import com.itechart.book_library.connection.ConnectionPool;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ActionFactory {
-    private final Map<String, Action> actions;
+    private final Map<String, Action> actionPerURL;
     private static ActionFactory actionFactory;
 
     private ActionFactory() {
-        actions = new HashMap<>();
+        actionPerURL = new HashMap<>();
 
-        actions.put("GET", new MainPageAction());
-        actions.put("GET/add", new BookAddPageAction());
-        actions.put("GET/edit", new BookEditPageAction());
+        actionPerURL.put("GET/main", new BookListAction());
+        actionPerURL.put("GET/add", new BookAddPageAction());
+        actionPerURL.put("GET/edit", new BookEditPageAction());
 
-        actions.put("POST/add", new BookAddAction());
-        actions.put("POST/edit", new BookEditAction());
+        actionPerURL.put("POST/add", new BookAddAction());
+        actionPerURL.put("POST/edit", new BookEditAction());
+        actionPerURL.put("POST/delete", new BookDeleteAction());
     }
 
     public static ActionFactory getInstance() {
@@ -33,6 +34,6 @@ public class ActionFactory {
     }
 
     public Action getAction(HttpServletRequest req) {
-        return actions.get(req.getMethod() + req.getServletPath());
+        return actionPerURL.get(req.getMethod() + req.getServletPath());
     }
 }

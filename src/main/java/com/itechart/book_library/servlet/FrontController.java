@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet({"", "/add", "/edit"})
+@WebServlet({"/main", "/add", "/edit", "/delete"})
 @MultipartConfig
 public class FrontController extends HttpServlet {
 
@@ -30,8 +30,7 @@ public class FrontController extends HttpServlet {
 
     private void doForwardOrRedirect(String viewName, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getMethod().equals("GET")) {
-            String path = "index.jsp";
-            if (!viewName.equals("")) path = "/WEB-INF/jsp/" + viewName + ".jsp";
+            String path = "/WEB-INF/jsp/" + viewName + ".jsp";
             req.getRequestDispatcher(path).forward(req, resp);
         } else {
             resp.sendRedirect(viewName);

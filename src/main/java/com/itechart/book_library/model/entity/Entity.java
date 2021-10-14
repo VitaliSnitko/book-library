@@ -1,5 +1,7 @@
 package com.itechart.book_library.model.entity;
 
+import java.util.Objects;
+
 public abstract class Entity {
     private int id;
 
@@ -16,5 +18,18 @@ public abstract class Entity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Entity entity = (Entity) o;
+        return id == entity.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

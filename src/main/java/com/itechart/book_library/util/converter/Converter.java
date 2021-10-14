@@ -15,19 +15,19 @@ public class Converter<T, U> {
         this.fromEntity = fromEntity;
     }
 
-    public final U convertFromDto(final T dto) {
+    public final U toEntity(final T dto) {
         return fromDto.apply(dto);
     }
 
-    public final T convertFromEntity(final U entity) {
+    public final T toDto(final U entity) {
         return fromEntity.apply(entity);
     }
 
-    public final List<U> createFromDtos(final Collection<T> dtos) {
-        return dtos.stream().map(this::convertFromDto).collect(Collectors.toList());
+    public final List<U> toEntities(final Collection<T> dtos) {
+        return dtos.stream().map(this::toEntity).collect(Collectors.toList());
     }
 
-    public final List<T> createFromEntities(final Collection<U> entities) {
-        return entities.stream().map(this::convertFromEntity).collect(Collectors.toList());
+    public final List<T> toDtos(final Collection<U> entities) {
+        return entities.stream().map(this::toDto).collect(Collectors.toList());
     }
 }

@@ -16,6 +16,7 @@ import com.itechart.book_library.util.converter.impl.GenreConverter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,11 +26,11 @@ public class LibraryService {
     private static AuthorDao authorDao = getDao(AuthorDaoImpl.class);
     private static GenreDao genreDao = getDao(GenreDaoImpl.class);
     private static AuthorBookDaoImpl authorBookDao = getDao(AuthorBookDaoImpl.class);
-    private static GenreBookDaoImpl GENRE_BOOK_DAO = getDao(GenreBookDaoImpl.class);
+    private static GenreBookDaoImpl genreBookDao = getDao(GenreBookDaoImpl.class);
 
-    private static final Converter<BookDto, BookEntity> BOOK_CONVERTER = new BookConverter();
-    private static final Converter<AuthorDto, AuthorEntity> AUTHOR_CONVERTER = new AuthorConverter();
-    private static final Converter<GenreDto, GenreEntity> GENRE_CONVERTER = new GenreConverter();
+    private static Converter<BookDto, BookEntity> bookConverter = new BookConverter();
+    private static Converter<AuthorDto, AuthorEntity> authorConverter = new AuthorConverter();
+    private static Converter<GenreDto, GenreEntity> genreConverter = new GenreConverter();
     private static LibraryService libraryService;
 
     private LibraryService() {
@@ -41,57 +42,37 @@ public class LibraryService {
         return libraryService;
     }
 
-    public void createBook(BookDto bookDto) throws SQLException {
+    public void createBook(BookDto bookDto) {
 
-        BookEntity book = BOOK_CONVERTER.toEntity(bookDto);
-        List<AuthorEntity> authorEntityList = AUTHOR_CONVERTER.toEntities(bookDto.getAuthorDtos());
-        List<GenreEntity> genreEntityList = GENRE_CONVERTER.toEntities(bookDto.getGenreDtos());
+        BookEntity book = bookConverter.toEntity(bookDto);
 
         bookDao.create(book);
-        for (AuthorEntity authorEntity : authorEntityList) {
+        for (AuthorEntity authorEntity : book.getAuthorEntities()) {
             authorEntity = authorDao.create(authorEntity);
             authorBookDao.setAuthorToBook(authorEntity.getId(), book.getId());
         }
-        for (GenreEntity genreEntity : genreEntityList) {
+        for (GenreEntity genreEntity : book.getGenreEntities()) {
             genreEntity = genreDao.create(genreEntity);
-            GENRE_BOOK_DAO.setGenreToBook(genreEntity.getId(), book.getId());
+            genreBookDao.setGenreToBook(genreEntity.getId(), book.getId());
         }
     }
 
-    public List<BookDto> getAll() throws SQLException {
-
-        List<BookDto> bookDtoList = new ArrayList<>();
-        List<BookEntity> bookEntityList = bookDao.getAll();
-
-        for (BookEntity bookEntity : bookEntityList) {
-            List<AuthorEntity> authorEntityListAssignedToBook = authorDao.getByBookId(bookEntity.getId());
-            List<GenreEntity> genreEntityListAssignedToBook = genreDao.getByBookId(bookEntity.getId());
-            BookDto bookDto = BOOK_CONVERTER.toDto(bookEntity);
-            bookDto.setAuthorDtos(AUTHOR_CONVERTER.toDtos(authorEntityListAssignedToBook));
-            bookDto.setGenreDtos(GENRE_CONVERTER.toDtos(genreEntityListAssignedToBook));
-            bookDtoList.add(bookDto);
-        }
-
-        return bookDtoList;
+    public List<BookDto> getLimitOffset(int bookAmountOnOnePage, int page) {
+        int offset = (page - 1) * bookAmountOnOnePage;
+        List<BookEntity> bookEntityList = bookDao.getLimitOffset(bookAmountOnOnePage, offset);
+        return bookConverter.toDtos(bookEntityList);
     }
 
-    public BookDto getById(int id) throws SQLException {
+    public BookDto getById(int id) {
         Optional<BookEntity> optionalBook = bookDao.getById(id);
         if (optionalBook.isEmpty()) return null;
-
-        BookEntity bookEntity = optionalBook.get();
-        List<AuthorEntity> authorEntityList = authorDao.getByBookId(bookEntity.getId());
-        List<GenreEntity> genreEntityList = genreDao.getByBookId(bookEntity.getId());
-        BookDto bookDto = BOOK_CONVERTER.toDto(bookEntity);
-        bookDto.setAuthorDtos(AUTHOR_CONVERTER.toDtos(authorEntityList));
-        bookDto.setGenreDtos(GENRE_CONVERTER.toDtos(genreEntityList));
-        return bookDto;
+        return bookConverter.toDto(optionalBook.get());
     }
 
-    public void update(BookDto bookDto) throws SQLException {
-        BookEntity book = BOOK_CONVERTER.toEntity(bookDto);
-        List<AuthorEntity> authorEntityList = AUTHOR_CONVERTER.toEntities(bookDto.getAuthorDtos());
-        List<GenreEntity> genreEntityList = GENRE_CONVERTER.toEntities(bookDto.getGenreDtos());
+    public void update(BookDto bookDto) {
+        BookEntity book = bookConverter.toEntity(bookDto);
+        List<AuthorEntity> authorEntityList = authorConverter.toEntities(bookDto.getAuthorDtos());
+        List<GenreEntity> genreEntityList = genreConverter.toEntities(bookDto.getGenreDtos());
 
         bookDao.update(book);
         for (AuthorEntity authorEntity : authorEntityList) {
@@ -103,11 +84,19 @@ public class LibraryService {
         for (GenreEntity genreEntity : genreEntityList) {
             if (genreDao.getByName(genreEntity.getName()).isEmpty()) {
                 genreEntity = genreDao.create(genreEntity);
-                GENRE_BOOK_DAO.setGenreToBook(genreEntity.getId(), book.getId());
+                genreBookDao.setGenreToBook(genreEntity.getId(), book.getId());
             }
         }
     }
-    
+
+    public void delete(String[] ids) {
+        bookDao.delete(Arrays.stream(ids).map(Integer::parseInt).toArray(Integer[]::new));
+    }
+
+    public int getBookCount() {
+        return bookDao.getCount();
+    }
+
     public static <T extends BaseDao> T getDao(Class<T> clazz) {
         T t = null;
         try {

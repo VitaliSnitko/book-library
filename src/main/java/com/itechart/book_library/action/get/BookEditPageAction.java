@@ -10,14 +10,11 @@ import java.sql.SQLException;
 
 public class BookEditPageAction implements Action {
 
+    private LibraryService libraryService = LibraryService.getInstance();
+
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) {
-        BookDto bookDto = null;
-        try {
-            bookDto = LibraryService.getInstance().getById(Integer.parseInt(req.getParameter("id")));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        BookDto bookDto = libraryService.getById(Integer.parseInt(req.getParameter("id")));
         req.setAttribute("bookDto", bookDto);
         return "edit";
     }

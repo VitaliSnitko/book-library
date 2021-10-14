@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GenreDao extends Dao<GenreEntity> {
-    Optional<GenreEntity> getById(int id) throws SQLException;
-    Optional<GenreEntity> getByName(String name) throws SQLException;
-    List<GenreEntity> getByBookId(int id) throws SQLException;
+    Optional<GenreEntity> getByName(String name);
+    List<GenreEntity> getByBookId(int id);
 }

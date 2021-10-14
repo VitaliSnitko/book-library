@@ -1,10 +1,17 @@
 package com.itechart.book_library.model.entity;
 
+import com.itechart.book_library.model.dto.AuthorDto;
+import com.itechart.book_library.model.dto.GenreDto;
+
 import java.io.InputStream;
 import java.sql.Date;
+import java.util.List;
+import java.util.Objects;
 
 public class BookEntity extends Entity {
     private String title;
+    List<AuthorEntity> authorEntities;
+    List<GenreEntity> genreEntities;
     private String publisher;
     private Date publishDate;
     private int pageCount;
@@ -15,9 +22,12 @@ public class BookEntity extends Entity {
     public BookEntity() {
     }
 
-    public BookEntity(int id, String title, String publisher, Date publishDate, int pageCount, String ISBN, String description, InputStream cover) {
+    public BookEntity(int id, String title, List<AuthorEntity> authorEntities, List<GenreEntity> genreEntities,
+                      String publisher, Date publishDate, int pageCount, String ISBN, String description, InputStream cover) {
         super(id);
         this.title = title;
+        this.authorEntities = authorEntities;
+        this.genreEntities = genreEntities;
         this.publisher = publisher;
         this.publishDate = publishDate;
         this.pageCount = pageCount;
@@ -80,5 +90,37 @@ public class BookEntity extends Entity {
 
     public void setCover(InputStream cover) {
         this.cover = cover;
+    }
+
+    public List<AuthorEntity> getAuthorEntities() {
+        return authorEntities;
+    }
+
+    public void setAuthorEntities(List<AuthorEntity> authorEntities) {
+        this.authorEntities = authorEntities;
+    }
+
+    public List<GenreEntity> getGenreEntities() {
+        return genreEntities;
+    }
+
+    public void setGenreEntities(List<GenreEntity> genreEntities) {
+        this.genreEntities = genreEntities;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        BookEntity that = (BookEntity) o;
+        return pageCount == that.pageCount && title.equals(that.title) && publisher.equals(that.publisher)
+                && publishDate.equals(that.publishDate) && ISBN.equals(that.ISBN)
+                && Objects.equals(description, that.description) && Objects.equals(cover, that.cover);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), title, publisher, publishDate, pageCount, ISBN, description, cover);
     }
 }

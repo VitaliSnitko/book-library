@@ -8,16 +8,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 
 public class BookEditAction implements Action {
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            LibraryService.getInstance().update(new BookDto(req));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+        LibraryService.getInstance().update(new BookDto(req));
+
         return "/";
     }
 }
