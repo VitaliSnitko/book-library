@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface BookDao extends Dao<BookEntity>{
     List<BookEntity> getLimitOffset(int limit, int offset);
     int getCount();
+    void takeBook(int id);
 //    Optional<BookEntity> getByTitle(String title) throws SQLException;
 //    List<BookEntity> getByAuthor(int id) throws SQLException;
 //    List<BookEntity> getByGenre(int id) throws SQLException;

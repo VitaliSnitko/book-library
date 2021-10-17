@@ -29,9 +29,12 @@ public class BookDto {
     private String description;
     private InputStream cover;
     private String base64Cover;
+    private int availableBookAmount;
+    private int totalBookAmount;
 
     public BookDto(int id, String title, List<AuthorDto> authorDtos, List<GenreDto> genreDtos,
-                   String publisher, Date publishDate, int pageCount, String ISBN, String description, InputStream cover) {
+                   String publisher, Date publishDate, int pageCount, String ISBN, String description,
+                   InputStream cover, int availableBookAmount, int totalBookAmount) {
         this.id = id;
         this.title = title;
         this.authorDtos = authorDtos;
@@ -48,25 +51,32 @@ public class BookDto {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.availableBookAmount = availableBookAmount;
+        this.totalBookAmount = totalBookAmount;
     }
 
     public BookDto(HttpServletRequest req) throws ServletException, IOException {
-        if (req.getParameter("id") != null)
-        id          = Integer.parseInt(req.getParameter("id"));
-        title       = req.getParameter("title");
-        authorDtos = Arrays.stream(req.getParameter("authors").split(" *, *"))
+        if (req.getParameter("id") != null) {
+            this.id = Integer.parseInt(req.getParameter("id"));
+        }
+        this.title = req.getParameter("title");
+        this.authorDtos = Arrays.stream(req.getParameter("authors").split(" *, *"))
                 .map(AuthorDto::new)
                 .collect(Collectors.toList());
-        genreDtos = Arrays.stream(req.getParameter("genres").split(" *, *"))
+        this.genreDtos = Arrays.stream(req.getParameter("genres").split(" *, *"))
                 .map(GenreDto::new)
                 .collect(Collectors.toList());
-        publisher   = req.getParameter("publisher");
-        publishDate = getDate(req.getParameter("date"));
-        pageCount   = Integer.parseInt(req.getParameter("page count"));
-        ISBN        = req.getParameter("ISBN");
-        description = req.getParameter("description");
-        cover       = req.getPart("cover").getInputStream();
-        if (cover.available() == 0) cover = null;
+        this.publisher = req.getParameter("publisher");
+        this.publishDate = getDate(req.getParameter("date"));
+        this.pageCount = Integer.parseInt(req.getParameter("pageCount"));
+        this.ISBN = req.getParameter("ISBN");
+        this.description = req.getParameter("description");
+        this.cover = req.getPart("cover").getInputStream();
+        if (cover.available() == 0) {
+            cover = null;
+        }
+        this.totalBookAmount = Integer.parseInt(req.getParameter("totalBookAmount"));
+        this.availableBookAmount = this.totalBookAmount;
     }
 
     private Date getDate(String stringDate) {
@@ -83,16 +93,8 @@ public class BookDto {
         return authorDtos;
     }
 
-    public void setAuthorDtos(List<AuthorDto> authorEntities) {
-        this.authorDtos = authorEntities;
-    }
-
     public List<GenreDto> getGenreDtos() {
         return genreDtos;
-    }
-
-    public void setGenreDtos(List<GenreDto> genreEntities) {
-        this.genreDtos = genreEntities;
     }
 
     public int getId() {
@@ -129,5 +131,13 @@ public class BookDto {
 
     public String getBase64Cover() {
         return base64Cover;
+    }
+
+    public int getAvailableBookAmount() {
+        return availableBookAmount;
+    }
+
+    public int getTotalBookAmount() {
+        return totalBookAmount;
     }
 }

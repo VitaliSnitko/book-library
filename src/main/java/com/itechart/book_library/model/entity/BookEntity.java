@@ -18,12 +18,15 @@ public class BookEntity extends Entity {
     private String ISBN;
     private String description;
     private InputStream cover;
+    private int availableBookAmount;
+    private int totalBookAmount;
 
     public BookEntity() {
     }
 
     public BookEntity(int id, String title, List<AuthorEntity> authorEntities, List<GenreEntity> genreEntities,
-                      String publisher, Date publishDate, int pageCount, String ISBN, String description, InputStream cover) {
+                      String publisher, Date publishDate, int pageCount, String ISBN, String description,
+                      InputStream cover, int availableBookAmount, int totalBookAmount) {
         super(id);
         this.title = title;
         this.authorEntities = authorEntities;
@@ -34,6 +37,8 @@ public class BookEntity extends Entity {
         this.ISBN = ISBN;
         this.description = description;
         this.cover = cover;
+        this.availableBookAmount = availableBookAmount;
+        this.totalBookAmount = totalBookAmount;
     }
 
     public String getTitle() {
@@ -106,6 +111,22 @@ public class BookEntity extends Entity {
 
     public void setGenreEntities(List<GenreEntity> genreEntities) {
         this.genreEntities = genreEntities;
+    }
+
+    public int getAvailableBookAmount() {
+        return availableBookAmount;
+    }
+
+    public void setAvailableBookAmount(int availableBookAmount) {
+        this.availableBookAmount = availableBookAmount;
+    }
+
+    public int getTotalBookAmount() {
+        return totalBookAmount;
+    }
+
+    public void setTotalBookAmount(int totalBookAmount) {
+        this.totalBookAmount = totalBookAmount;
     }
 
     @Override

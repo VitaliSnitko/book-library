@@ -17,7 +17,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
     private static final Logger log = Logger.getLogger(BookDaoImpl.class);
 
-    private static final String INSERT_BOOK_QUERY = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+    private static final String INSERT_BOOK_QUERY = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover, available, total_amount) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
     private static final String SELECT_ALL_QUERY = "SELECT * FROM book";
     private static final String SELECT_LIMIT_OFFSET_QUERY = """
             select book.*, author.*, genre.*
@@ -36,10 +36,11 @@ public class BookDaoImpl extends BaseDao implements BookDao {
                      left join genre_book on genre_book.book_id = book.id
                      left join genre on genre_book.genre_id = genre.id
             where book.id = ?""";
-    private static final String UPDATE_QUERY = "UPDATE book SET title = ?, publisher = ?, publish_date = ?, page_count = ?, isbn = ?, description = ?, cover = COALESCE(?, cover) WHERE id = ?";
-    private static final String TEMPLATE_DELETE_QUERY = "DELETE FROM book WHERE id IN(?";
-    private static String DELETE_QUERY = TEMPLATE_DELETE_QUERY;
+    private static final String UPDATE_QUERY = "UPDATE book SET title = ?, publisher = ?, publish_date = ?, page_count = ?, isbn = ?, description = ?, cover = COALESCE(?, cover), available = ? - total_amount + available, total_amount = ? WHERE id = ?";
+    private static final StringBuilder TEMPLATE_DELETE_QUERY = new StringBuilder("DELETE FROM book WHERE id IN(?");
+    private static StringBuilder DELETE_QUERY = TEMPLATE_DELETE_QUERY;
     private static final String SELECT_BOOK_COUNT = "SELECT COUNT(*) FROM book";
+    private static final String UPDATE_TAKE_BOOK_QUERY = "UPDATE book SET available = available-1 WHERE id = ?";
     private static final String SELECT_BY_TITLE_QUERY = "SELECT * FROM book WHERE title = ?";
     private static final String SELECT_BY_AUTHOR_QUERY = "SELECT * FROM book JOIN author_book ON book.id = author_book.author_id WHERE author_id = ?";
     private static final String SELECT_BY_GENRE_QUERY = "SELECT * FROM book JOIN genre_book ON book.id = genre_book.genre_id WHERE genre_id = ?";
@@ -56,7 +57,9 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setInt(i++, book.getPageCount());
             statement.setString(i++, book.getISBN());
             statement.setString(i++, book.getDescription());
-            statement.setBinaryStream(i, book.getCover());
+            statement.setBinaryStream(i++, book.getCover());
+            statement.setInt(i++, book.getAvailableBookAmount());
+            statement.setInt(i++, book.getTotalBookAmount());
             statement.execute();
             book.setId(getIdAfterInserting(statement));
         } catch (SQLException e) {
@@ -100,7 +103,9 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setString(i++, book.getISBN());
             statement.setString(i++, book.getDescription());
             statement.setBinaryStream(i++, book.getCover());
-            statement.setInt(i, book.getId());
+            statement.setInt(i++, book.getTotalBookAmount());
+            statement.setInt(i++, book.getTotalBookAmount());
+            statement.setInt(i++, book.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error("Cannot update book ", e);
@@ -111,12 +116,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
     @Override
     public void delete(Integer[] ids) {
-        for (int i = 0; i < ids.length - 1; i++) {
-            DELETE_QUERY += ",?";
-        }
-        DELETE_QUERY += ")";
+        DELETE_QUERY.append(",?".repeat(Math.max(0, ids.length - 1)));
+        DELETE_QUERY.append(")");
         Connection connection = connectionPool.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(String.valueOf(DELETE_QUERY))) {
             for (int i = 0; i < ids.length; i++) {
                 statement.setInt(i + 1, ids[i]);
             }
@@ -144,6 +147,18 @@ public class BookDaoImpl extends BaseDao implements BookDao {
         }
     }
 
+    public void takeBook(int id) {
+        Connection connection = connectionPool.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_TAKE_BOOK_QUERY)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Cannot get book ", e);
+        } finally {
+            connectionPool.returnToPool(connection);
+        }
+    }
+
 //    @Override
 //    public Optional<BookEntity> getByTitle(String title) throws SQLException {
 //        List<BookEntity> rsList = getListByKey(SELECT_BY_TITLE_QUERY, title);
@@ -164,6 +179,8 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 //    public List<BookEntity> getByDescription(String description) throws SQLException {
 //        return getListByKey(SELECT_BY_DESCRIPTION_QUERY, description);
 //    }
+
+
 
     private List<BookEntity> getListByKey(String query, int id) {
         Connection connection = connectionPool.getConnection();
@@ -210,12 +227,12 @@ public class BookDaoImpl extends BaseDao implements BookDao {
                 books.add(book);
             }
             AuthorEntity author = new AuthorEntity();
-            author.setId(resultSet.getInt(9));
-            author.setName(resultSet.getString(10));
+            author.setId(resultSet.getInt(11));
+            author.setName(resultSet.getString(12));
 
             GenreEntity genre = new GenreEntity();
-            genre.setId(resultSet.getInt(11));
-            genre.setName(resultSet.getString(12));
+            genre.setId(resultSet.getInt(13));
+            genre.setName(resultSet.getString(14));
 
             genreSet.add(genre);
             authorSet.add(author);
@@ -239,7 +256,9 @@ public class BookDaoImpl extends BaseDao implements BookDao {
         book.setPageCount(resultSet.getInt(i++));
         book.setISBN(resultSet.getString(i++));
         book.setDescription(resultSet.getString(i++));
-        book.setCover(resultSet.getBinaryStream(i));
+        book.setCover(resultSet.getBinaryStream(i++));
+        book.setAvailableBookAmount(resultSet.getInt(i++));
+        book.setTotalBookAmount(resultSet.getInt(i++));
         return book;
     }
 }

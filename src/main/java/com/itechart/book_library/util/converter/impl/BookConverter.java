@@ -23,7 +23,10 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
                 bookEntity.getPageCount(),
                 bookEntity.getISBN(),
                 bookEntity.getDescription(),
-                bookEntity.getCover());
+                bookEntity.getCover(),
+                bookEntity.getAvailableBookAmount(),
+                bookEntity.getTotalBookAmount());
+
     }
 
     private static BookEntity convertToEntity(BookDto bookDto) {
@@ -37,6 +40,8 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
                 bookDto.getPageCount(),
                 bookDto.getISBN(),
                 bookDto.getDescription(),
-                bookDto.getCover());
+                bookDto.getCover(),
+                bookDto.getAvailableBookAmount(),
+                bookDto.getTotalBookAmount());
     }
 }

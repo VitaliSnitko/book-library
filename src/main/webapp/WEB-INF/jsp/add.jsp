@@ -11,9 +11,10 @@
     <input type="text" placeholder="Genre(s) (divided by ',')" name="genres"><br>
     <input type="text" placeholder="Publisher" name="publisher"><br>
     <input type="date" placeholder="Publish date" name="date"><br>
-    <input type="text" placeholder="Page count" name="page count"><br>
+    <input type="text" placeholder="Page count" name="pageCount"><br>
     <input type="text" placeholder="ISBN" name="ISBN"><br>
     <textarea placeholder="Description" name="description"></textarea><br>
+    <input type="text" placeholder="Total book amount" name="totalBookAmount">
     <input type="file" accept="image/jpeg,image/png" name="cover"><br>
     <input type="submit" value="Submit">
 </form>

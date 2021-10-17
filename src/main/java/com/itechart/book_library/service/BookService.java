@@ -2,6 +2,9 @@ package com.itechart.book_library.service;
 
 import com.itechart.book_library.dao.api.*;
 import com.itechart.book_library.dao.impl.*;
+import com.itechart.book_library.dao.impl.AuthorDaoImpl;
+import com.itechart.book_library.dao.impl.BookDaoImpl;
+import com.itechart.book_library.dao.impl.GenreDaoImpl;
 import com.itechart.book_library.model.dto.AuthorDto;
 import com.itechart.book_library.model.dto.BookDto;
 import com.itechart.book_library.model.dto.GenreDto;
@@ -14,13 +17,11 @@ import com.itechart.book_library.util.converter.Converter;
 import com.itechart.book_library.util.converter.impl.GenreConverter;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class LibraryService {
+public class BookService extends Service{
 
     private static BookDao bookDao = getDao(BookDaoImpl.class);
     private static AuthorDao authorDao = getDao(AuthorDaoImpl.class);
@@ -31,29 +32,29 @@ public class LibraryService {
     private static Converter<BookDto, BookEntity> bookConverter = new BookConverter();
     private static Converter<AuthorDto, AuthorEntity> authorConverter = new AuthorConverter();
     private static Converter<GenreDto, GenreEntity> genreConverter = new GenreConverter();
-    private static LibraryService libraryService;
+    private static BookService bookService;
 
-    private LibraryService() {
+    private BookService() {
     }
 
-    public static LibraryService getInstance() {
-        if (libraryService == null)
-            libraryService = new LibraryService();
-        return libraryService;
+    public static BookService getInstance() {
+        if (bookService == null)
+            bookService = new BookService();
+        return bookService;
     }
 
     public void createBook(BookDto bookDto) {
 
-        BookEntity book = bookConverter.toEntity(bookDto);
+        BookEntity bookEntity = bookConverter.toEntity(bookDto);
 
-        bookDao.create(book);
-        for (AuthorEntity authorEntity : book.getAuthorEntities()) {
+        bookDao.create(bookEntity);
+        for (AuthorEntity authorEntity : bookEntity.getAuthorEntities()) {
             authorEntity = authorDao.create(authorEntity);
-            authorBookDao.setAuthorToBook(authorEntity.getId(), book.getId());
+            authorBookDao.setAuthorToBook(authorEntity.getId(), bookEntity.getId());
         }
-        for (GenreEntity genreEntity : book.getGenreEntities()) {
+        for (GenreEntity genreEntity : bookEntity.getGenreEntities()) {
             genreEntity = genreDao.create(genreEntity);
-            genreBookDao.setGenreToBook(genreEntity.getId(), book.getId());
+            genreBookDao.setGenreToBook(genreEntity.getId(), bookEntity.getId());
         }
     }
 
@@ -97,13 +98,4 @@ public class LibraryService {
         return bookDao.getCount();
     }
 
-    public static <T extends BaseDao> T getDao(Class<T> clazz) {
-        T t = null;
-        try {
-            t = clazz.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return t;
-    }
 }
