@@ -1,11 +1,15 @@
 package com.itechart.book_library.util.converter.impl;
 
 import com.itechart.book_library.model.dto.GenreDto;
+import com.itechart.book_library.model.dto.ReaderDto;
 import com.itechart.book_library.model.dto.RecordDto;
 import com.itechart.book_library.model.entity.GenreEntity;
 import com.itechart.book_library.model.entity.RecordEntity;
 import com.itechart.book_library.util.converter.Converter;
 
+import javax.servlet.http.HttpServletRequest;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.function.Function;
 
 public class RecordConverter extends Converter<RecordDto, RecordEntity> {
@@ -27,11 +31,21 @@ public class RecordConverter extends Converter<RecordDto, RecordEntity> {
     }
 
     private static RecordEntity convertToEntity(RecordDto recordDto) {
-        return new RecordEntity(
-                recordDto.getId(),
-                recordDto.getBorrowDate(),
-                recordDto.getDueDate(),
-                recordDto.getBookId(),
-                readerConverter.toEntity(recordDto.getReader()));
+        return RecordEntity.builder()
+                .id(recordDto.getId())
+                .borrowDate(recordDto.getBorrowDate())
+                .dueDate(recordDto.getDueDate())
+                .bookId(recordDto.getBookId())
+                .reader(readerConverter.toEntity(recordDto.getReader()))
+                .build();
+    }
+
+    private static RecordDto convertToDtoFromReq(HttpServletRequest req) {
+        LocalDate now = LocalDate.now();
+        return RecordDto.builder()
+                .borrowDate(Date.valueOf(now))
+                .dueDate(Date.valueOf(now.plusMonths(Integer.parseInt(req.getParameter("period")))))
+                .bookId(Integer.parseInt(req.getParameter("bookId")))
+                .build();
     }
 }

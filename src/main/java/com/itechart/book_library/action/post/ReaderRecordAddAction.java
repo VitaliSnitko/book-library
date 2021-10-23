@@ -10,13 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class RecordAddAction implements Action {
+public class ReaderRecordAddAction implements Action {
 
     ReaderService readerService = ReaderService.getInstance();
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        readerService.addReaderRecord(new ReaderDto(req), new RecordDto(req), Integer.parseInt(req.getParameter("bookId")));
+//        readerService.addReaderRecord(new ReaderDto(req), new RecordDto(req), Integer.parseInt(req.getParameter("bookId")));
         return "/";
     }
 }

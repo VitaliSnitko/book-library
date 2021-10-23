@@ -1,16 +1,16 @@
 package com.itechart.book_library.model.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import java.util.Objects;
 
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GenreEntity extends Entity {
     private String name;
-
-    public GenreEntity() {
-    }
-
-    public GenreEntity(String name) {
-        this.name = name;
-    }
 
     public String getName() {
         return name;

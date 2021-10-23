@@ -1,1 +1,42 @@
+/*.cover {*/
+/*    width: 100px;*/
+/*    height: 150px;*/
+/*}*/
+.image-parent {
+    max-width: 100px;
+}
 
+.publish-date {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+.form-check {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+
+.selected {
+    background-color: #614ad3;
+}
+
+.delete-message {
+    width: 400px;
+    height: 90px;
+    position: fixed;
+    bottom: 0;
+    right: 30px;
+    border-radius: 6px 6px 0 0;
+    background-color: #5338d9;
+    font-size: 27px;
+    font-family: "Arial Black", serif;
+    color: #e53c6f;
+    text-align: center;
+}
+
+
+.hidden {
+    display: none;
+}

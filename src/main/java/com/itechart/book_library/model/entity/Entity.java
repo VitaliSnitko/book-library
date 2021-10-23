@@ -1,16 +1,17 @@
 package com.itechart.book_library.model.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import java.util.Objects;
 
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class Entity {
     private int id;
-
-    public Entity() {
-    }
-
-    public Entity(int id) {
-        this.id = id;
-    }
 
     public int getId() {
         return id;

@@ -1,10 +1,12 @@
 package com.itechart.book_library.service;
 
-import com.itechart.book_library.dao.api.*;
+import com.itechart.book_library.connection.ConnectionPool;
+import com.itechart.book_library.dao.api.AuthorDao;
+import com.itechart.book_library.dao.api.BaseDao;
+import com.itechart.book_library.dao.api.BookDao;
+import com.itechart.book_library.dao.api.GenreDao;
 import com.itechart.book_library.dao.impl.*;
-import com.itechart.book_library.dao.impl.AuthorDaoImpl;
-import com.itechart.book_library.dao.impl.BookDaoImpl;
-import com.itechart.book_library.dao.impl.GenreDaoImpl;
+import com.itechart.book_library.dao.criteria.BookSpecification;
 import com.itechart.book_library.model.dto.AuthorDto;
 import com.itechart.book_library.model.dto.BookDto;
 import com.itechart.book_library.model.dto.GenreDto;
@@ -15,23 +17,27 @@ import com.itechart.book_library.util.converter.impl.AuthorConverter;
 import com.itechart.book_library.util.converter.impl.BookConverter;
 import com.itechart.book_library.util.converter.Converter;
 import com.itechart.book_library.util.converter.impl.GenreConverter;
+import org.apache.log4j.Logger;
 
-import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class BookService extends Service{
+public class BookService {
 
-    private static BookDao bookDao = getDao(BookDaoImpl.class);
-    private static AuthorDao authorDao = getDao(AuthorDaoImpl.class);
-    private static GenreDao genreDao = getDao(GenreDaoImpl.class);
-    private static AuthorBookDaoImpl authorBookDao = getDao(AuthorBookDaoImpl.class);
-    private static GenreBookDaoImpl genreBookDao = getDao(GenreBookDaoImpl.class);
+    private static final Logger log = Logger.getLogger(BookDaoImpl.class);
+    private final ConnectionPool connectionPool = ConnectionPool.getInstance();
+    private final BookDao bookDao = BaseDao.getDao(BookDaoImpl.class);
+    private final AuthorDao authorDao = BaseDao.getDao(AuthorDaoImpl.class);
+    private final GenreDao genreDao = BaseDao.getDao(GenreDaoImpl.class);
+    private final AuthorBookDaoImpl authorBookDao = BaseDao.getDao(AuthorBookDaoImpl.class);
+    private final GenreBookDaoImpl genreBookDao = BaseDao.getDao(GenreBookDaoImpl.class);
+    private final Converter<BookDto, BookEntity> bookConverter = new BookConverter();
+    private final Converter<AuthorDto, AuthorEntity> authorConverter = new AuthorConverter();
+    private final Converter<GenreDto, GenreEntity> genreConverter = new GenreConverter();
 
-    private static Converter<BookDto, BookEntity> bookConverter = new BookConverter();
-    private static Converter<AuthorDto, AuthorEntity> authorConverter = new AuthorConverter();
-    private static Converter<GenreDto, GenreEntity> genreConverter = new GenreConverter();
     private static BookService bookService;
 
     private BookService() {
@@ -64,6 +70,12 @@ public class BookService extends Service{
         return bookConverter.toDtos(bookEntityList);
     }
 
+    public List<BookDto> getLimitOffsetBySpecification(BookSpecification specification, int bookAmountOnOnePage, int page) {
+        int offset = (page - 1) * bookAmountOnOnePage;
+        List<BookEntity> bookEntityList = bookDao.getLimitOffsetBySpecification(specification, bookAmountOnOnePage, offset);
+        return bookConverter.toDtos(bookEntityList);
+    }
+
     public BookDto getById(int id) {
         Optional<BookEntity> optionalBook = bookDao.getById(id);
         if (optionalBook.isEmpty()) return null;
@@ -75,7 +87,10 @@ public class BookService extends Service{
         List<AuthorEntity> authorEntityList = authorConverter.toEntities(bookDto.getAuthorDtos());
         List<GenreEntity> genreEntityList = genreConverter.toEntities(bookDto.getGenreDtos());
 
-        bookDao.update(book);
+        Connection connection = connectionPool.getConnection();
+        setAutoCommit(connection, false);
+
+        bookDao.update(book, connection);
         for (AuthorEntity authorEntity : authorEntityList) {
             if (authorDao.getByName(authorEntity.getName()).isEmpty()) {
                 authorEntity = authorDao.create(authorEntity);
@@ -88,6 +103,24 @@ public class BookService extends Service{
                 genreBookDao.setGenreToBook(genreEntity.getId(), book.getId());
             }
         }
+        commit(connection);
+        setAutoCommit(connection, true);
+    }
+
+    private void setAutoCommit(Connection connection, boolean autoCommit) {
+        try {
+            connection.setAutoCommit(autoCommit);
+        } catch (SQLException e) {
+            log.error("Cannot set autoCommit", e);
+        }
+    }
+
+    private void commit(Connection connection) {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            log.error(e);
+        }
     }
 
     public void delete(String[] ids) {
@@ -96,6 +129,10 @@ public class BookService extends Service{
 
     public int getBookCount() {
         return bookDao.getCount();
+    }
+
+    public int getBookCountBySpecification(BookSpecification specification) {
+        return bookDao.getCountBySpecification(specification);
     }
 
 }

@@ -1,9 +1,12 @@
 package com.itechart.book_library.model.dto;
 
+import lombok.Builder;
+
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
 import java.time.LocalDate;
 
+@Builder
 public class RecordDto {
     int id;
     Date borrowDate;

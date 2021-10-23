@@ -2,6 +2,9 @@ package com.itechart.book_library.model.dto;
 
 import com.itechart.book_library.model.entity.AuthorEntity;
 import com.itechart.book_library.model.entity.GenreEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
@@ -16,6 +19,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookDto {
 
     private int id;

@@ -1,7 +1,7 @@
 package com.itechart.book_library.dao.impl;
 
-import com.itechart.book_library.dao.api.AuthorDao;
 import com.itechart.book_library.dao.api.BaseDao;
+import com.itechart.book_library.dao.api.AuthorDao;
 import com.itechart.book_library.model.entity.AuthorEntity;
 import org.apache.log4j.Logger;
 
@@ -60,6 +60,11 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
     }
 
     @Override
+    public void update(AuthorEntity entity, Connection connection) {
+
+    }
+
+    @Override
     public void delete(Integer[] ids) {
 
     }
@@ -92,7 +97,7 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
         Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, text);
-            return getListFromResultSet( statement.executeQuery());
+            return getListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             log.error("Cannot get list by " + text + " key ", e);
             return null;

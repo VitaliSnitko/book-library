@@ -2,16 +2,22 @@ package com.itechart.book_library.model.entity;
 
 import com.itechart.book_library.model.dto.AuthorDto;
 import com.itechart.book_library.model.dto.GenreDto;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.InputStream;
 import java.sql.Date;
 import java.util.List;
 import java.util.Objects;
 
+@SuperBuilder
+@NoArgsConstructor
 public class BookEntity extends Entity {
+
     private String title;
-    List<AuthorEntity> authorEntities;
-    List<GenreEntity> genreEntities;
+    private List<AuthorEntity> authorEntities;
+    private List<GenreEntity> genreEntities;
     private String publisher;
     private Date publishDate;
     private int pageCount;
@@ -20,26 +26,6 @@ public class BookEntity extends Entity {
     private InputStream cover;
     private int availableBookAmount;
     private int totalBookAmount;
-
-    public BookEntity() {
-    }
-
-    public BookEntity(int id, String title, List<AuthorEntity> authorEntities, List<GenreEntity> genreEntities,
-                      String publisher, Date publishDate, int pageCount, String ISBN, String description,
-                      InputStream cover, int availableBookAmount, int totalBookAmount) {
-        super(id);
-        this.title = title;
-        this.authorEntities = authorEntities;
-        this.genreEntities = genreEntities;
-        this.publisher = publisher;
-        this.publishDate = publishDate;
-        this.pageCount = pageCount;
-        this.ISBN = ISBN;
-        this.description = description;
-        this.cover = cover;
-        this.availableBookAmount = availableBookAmount;
-        this.totalBookAmount = totalBookAmount;
-    }
 
     public String getTitle() {
         return title;

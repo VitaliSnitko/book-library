@@ -1,6 +1,7 @@
 package com.itechart.book_library.action.get;
 
 import com.itechart.book_library.action.api.Action;
+import com.itechart.book_library.dao.criteria.BookSpecification;
 import com.itechart.book_library.service.BookService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,11 +27,28 @@ public class BookListAction implements Action {
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) {
 
-        int totalAmountOfBooks = bookService.getBookCount();
-        int page = (req.getParameter("page") == null) ? 1 : Integer.parseInt(req.getParameter("page"));
-        req.setAttribute("bookList", bookService.getLimitOffset(bookAmountOnOnePage, page));
+        int page = getPage(req);
+        BookSpecification specification = getSpecification(req);
+        int totalAmountOfBooks = bookService.getBookCountBySpecification(specification);
+
+        req.setAttribute("bookList", bookService.getLimitOffsetBySpecification(specification, bookAmountOnOnePage, page));
         req.setAttribute("pageAmount", Math.ceil((float) totalAmountOfBooks / bookAmountOnOnePage));
 
         return "main";
     }
+
+    private int getPage(HttpServletRequest req) {
+        return (req.getParameter("page") == null) ? 1 : Integer.parseInt(req.getParameter("page"));
+    }
+
+    private BookSpecification getSpecification(HttpServletRequest req) {
+        return BookSpecification.builder()
+                .title(req.getParameter("title"))
+                .authors(req.getParameter("authors"))
+                .genres(req.getParameter("genres"))
+                .description(req.getParameter("description"))
+                .build()
+                .convertSpecificationParametersToRegex();
+    }
+
 }

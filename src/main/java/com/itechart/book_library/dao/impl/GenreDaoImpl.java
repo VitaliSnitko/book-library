@@ -60,6 +60,11 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     }
 
     @Override
+    public void update(GenreEntity entity, Connection connection) {
+
+    }
+
+    @Override
     public void delete(Integer[] id) {
     }
 

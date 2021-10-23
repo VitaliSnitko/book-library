@@ -1,16 +1,17 @@
 package com.itechart.book_library.model.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import java.util.Objects;
 
-public class AuthorEntity extends Entity{
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+public class AuthorEntity extends Entity {
     private String name;
-
-    public AuthorEntity() {
-    }
-
-    public AuthorEntity(String name) {
-        this.name = name;
-    }
 
     public String getName() {
         return name;

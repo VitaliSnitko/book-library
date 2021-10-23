@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet({"/main", "/add", "/edit", "/delete", "/add-record"})
+@WebServlet({"/main", "/add", "/edit", "/delete", "/add-record", "/search"})
 @MultipartConfig
 public class FrontController extends HttpServlet {
 

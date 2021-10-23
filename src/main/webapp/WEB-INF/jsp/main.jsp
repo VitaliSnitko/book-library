@@ -3,237 +3,111 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Book Library</title>
-    <%--    <link rel="stylesheet" href="../../css/main-page.css">--%>
-    <style>
-        a {
-            text-decoration: none;
-            color: black;
-        }
-
-        .selected a {
-            color: white;
-        }
-
-        .add-book {
-            position: relative;
-            height: 48px;
-            width: 120px;
-            border-radius: 24px;
-            color: #3c4043;
-            box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
-        }
-
-        .add-book:hover {
-            box-shadow: 0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%);
-            background-color: #fafafb;
-        }
-
-        .plus-icon {
-            position: absolute;
-            top: 50%;
-            left: 8px;
-            transform: translate(0, -50%);
-        }
-
-        .add-book-text {
-            position: absolute;
-            top: 50%;
-            left: 40px;
-            transform: translate(0, -50%);
-            margin-right: 5px;
-            font-family: 'Google Sans', Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
-            font-size: .875rem;
-        }
-
-        .book {
-            position: relative;
-            width: 700px;
-            height: 150px;
-            border: 1px black solid;
-            padding: 10px;
-            margin-top: 10px;
-        }
-
-        .cover {
-            float: left;
-            width: 100px;
-            height: 150px;
-            margin-right: 20px;
-        }
-
-        .title {
-            font-size: 24px;
-            font-family: "Arial Black", serif;
-        }
-
-        .publish-date {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-        }
-
-        .authors {
-            font-family: Arial, serif;
-            font-size: 16px;
-        }
-
-        /*.delete-icon {*/
-        /*    position: absolute;*/
-        /*    top: 3px;*/
-        /*    right: 3px;*/
-        /*    width: 30px;*/
-        /*    height: 30px;*/
-        /*}*/
-        .checkbox {
-            display: none;
-        }
-
-        .checkbox + label {
-            background: url("../../images/delete-icon.png") no-repeat;
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            width: 30px;
-            height: 30px;
-            background-size: 100%;
-        }
-
-        .selected {
-            background-color: #614ad3;
-        }
-
-        .delete-message {
-            width: 400px;
-            height: 90px;
-            position: fixed;
-            bottom: 0;
-            right: 30px;
-            border-radius: 6px 6px 0 0;
-            background-color: #5338d9;
-            font-size: 27px;
-            font-family: "Arial Black", serif;
-            color: #e53c6f;
-            text-align: center;
-        }
-
-        .ok {
-            background-color: Transparent;
-            font-size: 30px;
-            text-align: center;
-            color: #dc1a55;
-            font-family: "Arial Black", serif;
-        }
-
-        .ok:hover {
-            color: whitesmoke;
-        }
-
-        .ok:active {
-            position: relative;
-            top: 3px;
-            font-size: 24px;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="../../css/main-page.css">
+  <script defer src="../../js/main-page.js"></script>
+  <title>Book Library</title>
 </head>
 <body>
-<a href="<c:url value="/add"/>">
-    <div class="add-book">
-        <img class="plus-icon" src="../../images/plus-icon.png" alt="add">
-        <span class="add-book-text">Add book</span>
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="navbar-nav">
+        <a class="nav-link active" aria-current="page" href="/main">Home</a>
+        <a class="nav-link" href="/add">Add book</a>
+        <a class="nav-link" href="/search" tabindex="-1">Search</a>
+      </div>
     </div>
-</a>
-
-<form action="delete" method="post">
-    <div id="book list">
-
-        <c:forEach var="bookDto" items="${requestScope.bookList}">
-            <div class="book">
+  </div>
+</nav>
+<div class="container">
+  <form action="delete" method="post">
+    <div class="row mt-2">
+      <div class="col-12 col-sm-8 col-lg-5">
+        <div class="list-group">
+          <c:forEach var="bookDto" items="${requestScope.bookList}">
+            <a href="/edit?id=${bookDto.id}" class="list-group-item list-group-item-action d-flex">
+              <div class="image-parent">
                 <c:choose>
-                    <c:when test="${bookDto.base64Cover.equals(\"\")}">
-                        <img class="cover" src="../../images/placeholder-cover.png" alt="lorem">
-                    </c:when>
-                    <c:otherwise>
-                        <img class="cover" src="data:image/jpeg;base64,${bookDto.base64Cover}" alt="lorem">
-                    </c:otherwise>
+                  <c:when test="${bookDto.base64Cover.equals(\"\")}">
+                    <img class="img-fluid rounded cover" src="../../images/placeholder-cover.png"
+                         alt="lorem">
+                  </c:when>
+                  <c:otherwise>
+                    <img class="img-fluid rounded cover"
+                         src="data:image/jpeg;base64,${bookDto.base64Cover}"
+                         alt="lorem">
+                  </c:otherwise>
                 </c:choose>
-                <a href="<c:url value="/edit?id=${bookDto.id}"/>">
-                    <span class="title">${bookDto.title}</span>
-                </a><br>
-
-                <input class="checkbox" type="checkbox" name="delete" value="${bookDto.id}" id="${bookDto.id}">
-                <label for="${bookDto.id}"></label>
-
-                <span class="authors">${bookDto.authorDtos.get(0).name}</span>
-                <c:if test="${bookDto.authorDtos.size() > 1}">
+              </div>
+              <div class="flex-column ms-3">
+                <h4>${bookDto.title}</h4>
+                <p><small>
+                    ${bookDto.authorDtos.get(0).name}
+                  <c:if test="${bookDto.authorDtos.size() > 1}">
                     <c:forEach var="authorEntity" items="${bookDto.authorDtos}" begin="1">
-                        <span class="authors">, ${authorEntity.name}</span>
+                      , ${authorEntity.name}
                     </c:forEach>
-                </c:if>
-                <br>
-                <span class="publish-date"><b>Publish date:</b> ${bookDto.publishDate}</span>
-            </div>
-        </c:forEach>
+                  </c:if>
+                </small></p>
+                <span class="badge rounded-pill bg-info"> ${bookDto.availableBookAmount} Copies in Stock</span>
+                <small class="publish-date text-muted"><b>Publish date:</b> ${bookDto.publishDate}
+                </small>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="delete" value="${bookDto.id}">
+                </div>
+              </div>
+            </a>
+          </c:forEach>
+        </div>
+      </div>
     </div>
+    <div class="row">
+      <div class="alert alert-danger d-none position-fixed bottom-0 end-0 col-2" role="alert">
+        Delete selected books?
+        <button class="btn btn-danger" type="submit">Ok</button>
+      </div>
+    </div>
+  </form>
+  <c:set var="pageAmount" value="${requestScope.pageAmount}"/>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      <c:if test="${param.page != null && param.page != 1}">
+        <li class="page-item">
+          <a class="page-link" href="/main?page=${param.page - 1}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      </c:if>
 
-<c:set var="pageAmount" value="${requestScope.pageAmount}"/>
+      <c:forEach var="pageNum" begin="1" end="${pageAmount}">
+        <li class="page-item"><a class="page-link" href="/main?page=${pageNum}">${pageNum}</a></li>
+      </c:forEach>
 
-<c:if test="${param.page != null && param.page != 1}">
-    <a href="<c:url value="/main?page=${param.page - 1}"/>">< </a>
-</c:if>
-
-<c:forEach var="pageNum" begin="1" end="${pageAmount}">
-    <a href="<c:url value="/main?page=${pageNum}"/>">${pageNum} </a>
-</c:forEach>
-
-<c:if test="${param.page != pageAmount}">
-    <a href="<c:url value="/main?page=${param.page + 1}"/>"> ></a>
-</c:if>
-<div class="delete-message hidden">
-    <span>Delete selected books?</span><br>
-    <input class="ok" type="submit" value="Ok">
-<%--    <a class="ok" href="<c:url value="/delete"/>">Ok</a>--%>
+      <c:if test="${param.page != pageAmount}">
+        <c:set var="currentPage" value="${param.page}"/>
+        <c:if test="${currentPage == null}"><c:set var="currentPage" value="1"/></c:if>
+        <li class="page-item">
+          <a class="page-link" href="/main?page=${currentPage + 1}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </c:if>
+    </ul>
+  </nav>
 </div>
-</form>
-<script>
-    let deleteIcons = document.getElementsByClassName("checkbox");
-    let books = document.getElementsByClassName("book");
-    let isDeleteMessageShown = false;
 
-    function selectDelete(i) {
-        books[i].classList.toggle("selected");
-        if (document.getElementsByClassName("selected").length === 1 && isDeleteMessageShown === false
-            || document.getElementsByClassName("selected").length === 0 && isDeleteMessageShown === true) {
-            document.getElementsByClassName("delete-message")[0].classList.toggle("hidden");
-            isDeleteMessageShown = !isDeleteMessageShown;
-        }
-    }
-
-    for (let i = 0; i < deleteIcons.length; i++) {
-        deleteIcons[i].addEventListener('click', () => selectDelete(i));
-    }
-
-    let deleteButton = document.getElementsByClassName("ok")[0];
-    deleteButton.onmousedown = function () {
-        let url = new URL(deleteButton.href);
-        let books = document.getElementsByClassName('book');
-        let ids = document.querySelectorAll('.book .id');
-        for (let i = 0; i < books.length; i++) {
-            if (books[i].classList.contains('selected')) {
-                url.searchParams.append('id', ids[i].textContent);
-            }
-        }
-        deleteButton.href = url;
-    }
-
-
-</script>
 </body>
 </html>
