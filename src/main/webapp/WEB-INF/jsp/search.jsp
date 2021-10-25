@@ -36,31 +36,31 @@
           </div>
         </div>
         <div class="row mb-2 justify-content-center">
-          <label for="title" class="form-label col-sm-2 col-form-label">Title</label>
+          <label for="title" class="form-label col-sm-1 col-form-label">Title</label>
           <div class="col-sm-4">
             <input type="text" name="title" class="form-control" id="title">
           </div>
         </div>
         <div class="row mb-2 justify-content-center">
-          <label for="authors" class="form-label col-sm-2 col-form-label">Authors</label>
+          <label for="authors" class="form-label col-sm-1 col-form-label">Authors</label>
           <div class="col-sm-4">
             <input type="text" name="authors" class="form-control" id="authors">
           </div>
         </div>
         <div class="row mb-2 justify-content-center">
-          <label for="genres" class="form-label col-sm-2 col-form-label">Genres</label>
+          <label for="genres" class="form-label col-sm-1 col-form-label">Genres</label>
           <div class="col-sm-4">
             <input type="text" name="genres" class="form-control" id="genres">
           </div>
         </div>
         <div class="row mb-2 justify-content-center">
-          <label for="description" class="form-label col-sm-2 col-form-label">Description</label>
+          <label for="description" class="form-label col-sm-1 col-form-label">Description</label>
           <div class="col-sm-4">
             <input type="text" name="description" class="form-control" id="description">
           </div>
         </div>
-        <div class="row mb-2 justify-content-center">
-          <div class="col-sm-6">
+        <div class="row mt-4 justify-content-center">
+          <div class="col-sm-5">
             <button class="btn btn-primary me-3" type="submit">Search</button>
           </div>
         </div>

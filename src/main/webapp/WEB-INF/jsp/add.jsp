@@ -9,7 +9,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
           integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
           crossorigin="anonymous"></script>
+  <link href="../../css/selection-color.css" rel="stylesheet">
   <script defer src="../../js/form-validation.js"></script>
+  <script defer src="../../js/max-file-size-upload.js"></script>
   <title>Add Book</title>
 </head>
 <body>
@@ -32,7 +34,7 @@
     <div class="row mb-3 justify-content-center">
       <label for="validationCustom01" class="form-label col-sm-2 col-form-label">Title</label>
       <div class="col-sm-4">
-        <input type="text" name="title" class="form-control" id="validationCustom01" required pattern="[a-zA-Z0-9 ]+">
+        <input type="text" name="title" class="form-control" id="validationCustom01" required>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
@@ -40,7 +42,7 @@
       <div class="col-sm-4">
         <div class="input-group has-validation">
           <input type="text" name="authors" class="form-control" id="validationCustom02" required
-                 pattern="[a-zA-Z ]+ *(, *[a-zA-Z ]+)*">
+                 pattern="[a-zA-Z '-]+ *(, *[a-zA-Z '-]+)*">
           <div class="invalid-feedback">
             Please, enter authors divided by ','
           </div>
@@ -52,7 +54,7 @@
       <div class="col-sm-4">
         <div class="input-group has-validation">
           <input type="text" name="genres" class="form-control" id="validationCustomUsername"
-                 aria-describedby="inputGroupPrepend" required pattern="[a-zA-Z ]+ *(, *[a-zA-Z ]+)*">
+                 aria-describedby="inputGroupPrepend" required pattern="[a-zA-Z '-]+ *(, *[a-zA-Z '-]+)*">
           <div class="invalid-feedback">
             Please, enter genres divided by ','
           </div>
@@ -62,8 +64,7 @@
     <div class="row mb-3 justify-content-center">
       <label for="validationCustom03" class="form-label col-sm-2 col-form-label">Publisher</label>
       <div class="col-sm-4">
-        <input type="text" name="publisher" class="form-control" id="validationCustom03" required
-               pattern="[a-zA-Z0-9 ]+">
+        <input type="text" name="publisher" class="form-control" id="validationCustom03" required>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
@@ -97,9 +98,9 @@
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
-      <label for="validationCustom09" class="form-label col-sm-2 col-form-label">Cover</label>
+      <label for="cover" class="form-label col-sm-2 col-form-label">Cover</label>
       <div class="col-sm-4">
-        <input class="form-control" type="file" accept="image/jpeg,image/png" name="cover" id="validationCustom09">
+        <input class="form-control" type="file" accept="image/jpeg,image/png" name="cover" id="cover">
       </div>
       <div class="invalid-feedback">
         Пожалуйста, предоставьте действующий почтовый индекс.

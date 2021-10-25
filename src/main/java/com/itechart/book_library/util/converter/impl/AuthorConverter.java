@@ -5,6 +5,7 @@ import com.itechart.book_library.model.entity.AuthorEntity;
 import com.itechart.book_library.util.converter.Converter;
 
 public class AuthorConverter extends Converter<AuthorDto, AuthorEntity> {
+
     public AuthorConverter() {
         super(AuthorConverter::convertToEntity, AuthorConverter::convertToDto);
     }

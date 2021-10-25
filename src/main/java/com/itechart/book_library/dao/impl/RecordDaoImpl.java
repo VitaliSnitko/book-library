@@ -1,7 +1,8 @@
 package com.itechart.book_library.dao.impl;
 
 import com.itechart.book_library.dao.api.BaseDao;
-import com.itechart.book_library.model.entity.*;
+import com.itechart.book_library.model.entity.ReaderEntity;
+import com.itechart.book_library.model.entity.RecordEntity;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -25,8 +26,7 @@ public class RecordDaoImpl extends BaseDao {
              where book.id = ?
             """;
 
-    public RecordEntity create(RecordEntity recordEntity) {
-        Connection connection = connectionPool.getConnection();
+    public RecordEntity create(RecordEntity recordEntity, Connection connection) {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
             statement.setInt(1, recordEntity.getBookId());
             statement.setInt(2, recordEntity.getReader().getId());
@@ -36,8 +36,6 @@ public class RecordDaoImpl extends BaseDao {
             recordEntity.setId(getIdAfterInserting(statement));
         } catch (SQLException e) {
             log.error("Cannot create record ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
         }
         return recordEntity;
     }

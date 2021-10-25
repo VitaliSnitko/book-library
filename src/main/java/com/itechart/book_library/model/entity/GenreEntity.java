@@ -10,6 +10,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenreEntity extends Entity {
+
     private String name;
 
     public String getName() {

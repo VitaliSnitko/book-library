@@ -2,6 +2,7 @@ package com.itechart.book_library.servlet;
 
 import com.itechart.book_library.action.api.Action;
 import com.itechart.book_library.action.api.ActionFactory;
+import com.itechart.book_library.action.api.ActionResult;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet({"/main", "/add", "/edit", "/delete", "/add-record", "/search"})
-@MultipartConfig
+@MultipartConfig(maxFileSize = 2097152)
 public class FrontController extends HttpServlet {
 
     ActionFactory actionFactory;
@@ -28,12 +29,12 @@ public class FrontController extends HttpServlet {
         doForwardOrRedirect(action.execute(req, resp), req, resp);
     }
 
-    private void doForwardOrRedirect(String viewName, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getMethod().equals("GET")) {
-            String path = "/WEB-INF/jsp/" + viewName + ".jsp";
-            req.getRequestDispatcher(path).forward(req, resp);
+    private void doForwardOrRedirect(ActionResult actionResult, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (actionResult.isRedirect()) {
+            resp.sendRedirect(actionResult.getPath());
         } else {
-            resp.sendRedirect(viewName);
+            String path = "/WEB-INF/jsp/" + actionResult.getPath() + ".jsp";
+            req.getRequestDispatcher(path).forward(req, resp);
         }
     }
 }

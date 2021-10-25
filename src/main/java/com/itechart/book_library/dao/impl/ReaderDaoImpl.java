@@ -26,19 +26,13 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
             WHERE email = ? and record.book_id = ?;""";
     private static final String UPDATE_QUERY = "UPDATE reader SET first_name = ? WHERE id = ?";
 
-
     @Override
-    public ReaderEntity create(ReaderEntity reader) {
-        Connection connection = connectionPool.getConnection();
+    public ReaderEntity create(ReaderEntity reader, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
             statement.setString(1, reader.getEmail());
             statement.setString(2, reader.getName());
             statement.execute();
             reader.setId(getIdAfterInserting(statement));
-        } catch (SQLException e) {
-            log.error("Cannot create record ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
         }
         return reader;
     }
@@ -68,20 +62,6 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
     }
 
     @Override
-    public void update(ReaderEntity reader) {
-        Connection connection = connectionPool.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
-            statement.setString(1, reader.getName());
-            statement.setInt(2, reader.getId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            log.error("Cannot create record ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
-        }
-    }
-
-    @Override
     public void update(ReaderEntity entity, Connection connection) {
 
     }
@@ -91,8 +71,7 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
 
     }
 
-    public Optional<ReaderEntity> getByEmail(String email) {
-        Connection connection = connectionPool.getConnection();
+    public Optional<ReaderEntity> getByEmail(String email, Connection connection) {
         Optional<ReaderEntity> readerEntity = Optional.empty();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_EMAIL_QUERY)) {
             statement.setString(1, email);
@@ -105,14 +84,11 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
             }
         } catch (SQLException e) {
             log.error("Cannot get by email ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
         }
         return readerEntity;
     }
 
-    public Optional<ReaderEntity> getByEmailInCurrentBook(String email, int bookId) {
-        Connection connection = connectionPool.getConnection();
+    public Optional<ReaderEntity> getByEmailInCurrentBook(String email, int bookId, Connection connection) {
         Optional<ReaderEntity> readerEntity = Optional.empty();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_EMAIL_AND_BOOK_QUERY)) {
             statement.setString(1, email);
@@ -126,8 +102,6 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
             }
         } catch (SQLException e) {
             log.error("Cannot get by email ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
         }
         return readerEntity;
     }

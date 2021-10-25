@@ -5,6 +5,7 @@ import com.itechart.book_library.model.entity.GenreEntity;
 import com.itechart.book_library.util.converter.Converter;
 
 public class GenreConverter extends Converter<GenreDto, GenreEntity> {
+
     public GenreConverter() {
         super(GenreConverter::convertToEntity, GenreConverter::convertToDto);
     }

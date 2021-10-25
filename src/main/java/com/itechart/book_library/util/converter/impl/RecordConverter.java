@@ -1,16 +1,12 @@
 package com.itechart.book_library.util.converter.impl;
 
-import com.itechart.book_library.model.dto.GenreDto;
-import com.itechart.book_library.model.dto.ReaderDto;
 import com.itechart.book_library.model.dto.RecordDto;
-import com.itechart.book_library.model.entity.GenreEntity;
 import com.itechart.book_library.model.entity.RecordEntity;
 import com.itechart.book_library.util.converter.Converter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.function.Function;
 
 public class RecordConverter extends Converter<RecordDto, RecordEntity> {
 

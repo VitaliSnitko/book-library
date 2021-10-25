@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class BaseDao {
+
     protected ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     public static <T extends BaseDao> T getDao(Class<T> clazz) {

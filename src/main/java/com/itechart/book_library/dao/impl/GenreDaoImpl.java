@@ -26,37 +26,19 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private static final String SELECT_BY_BOOK_ID_QUERY = "SELECT * FROM genre JOIN genre_book ON genre.id = genre_book.genre_id JOIN book ON genre_book.book_id = book.id WHERE book_id = ?";
 
     @Override
-    public GenreEntity create(GenreEntity genreEntity) {
-        Connection connection = connectionPool.getConnection();
+    public GenreEntity create(GenreEntity genre, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
-            statement.setString(1, genreEntity.getName());
+            statement.setString(1, genre.getName());
             statement.execute();
-            genreEntity.setId(getIdAfterInserting(statement));
-        } catch (SQLException e) {
-            log.error("Cannot create genre ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
+            genre.setId(getIdAfterInserting(statement));
         }
-        return genreEntity;
+        return genre;
     }
 
     @Override
     public Optional<GenreEntity> getById(int id) {
         List<GenreEntity> rsList = getListByKey(SELECT_BY_ID_QUERY, id);
         return rsList.isEmpty() ? Optional.empty() : Optional.of(rsList.get(0));
-    }
-
-    @Override
-    public void update(GenreEntity genreEntity) {
-        Connection connection = connectionPool.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
-            statement.setString(1, genreEntity.getName());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            log.error("Cannot update genre ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
-        }
     }
 
     @Override

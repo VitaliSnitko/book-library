@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public class ReaderDto {
+
     int id;
     String email;
     String name;

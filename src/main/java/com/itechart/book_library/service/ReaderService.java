@@ -1,49 +1,46 @@
 package com.itechart.book_library.service;
 
+import com.itechart.book_library.connection.ConnectionPool;
 import com.itechart.book_library.dao.api.BaseDao;
 import com.itechart.book_library.dao.api.BookDao;
 import com.itechart.book_library.dao.api.ReaderDao;
 import com.itechart.book_library.dao.impl.BookDaoImpl;
 import com.itechart.book_library.dao.impl.ReaderDaoImpl;
 import com.itechart.book_library.dao.impl.RecordDaoImpl;
-import com.itechart.book_library.model.dto.*;
-import com.itechart.book_library.model.entity.*;
+import com.itechart.book_library.model.dto.ReaderDto;
+import com.itechart.book_library.model.dto.RecordDto;
+import com.itechart.book_library.model.entity.ReaderEntity;
+import com.itechart.book_library.model.entity.RecordEntity;
 import com.itechart.book_library.util.converter.Converter;
-import com.itechart.book_library.util.converter.impl.*;
+import com.itechart.book_library.util.converter.impl.ReaderConverter;
+import com.itechart.book_library.util.converter.impl.RecordConverter;
+import lombok.extern.log4j.Log4j;
 
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReaderService {
+@Log4j
+public enum ReaderService {
+    INSTANCE;
 
-    private final ReaderDao readerDao;
+    private final ConnectionPool connectionPool = ConnectionPool.getInstance();
+    private final ReaderDao readerDao = BaseDao.getDao(ReaderDaoImpl.class);
     private final RecordDaoImpl recordDao = BaseDao.getDao(RecordDaoImpl.class);
     private final BookDao bookDao = BaseDao.getDao(BookDaoImpl.class);
 
     private final Converter<ReaderDto, ReaderEntity> readerConverter = new ReaderConverter();
     private final Converter<RecordDto, RecordEntity> recordConverter = new RecordConverter();
 
-    private static ReaderService readerService;
-
-    private ReaderService() {
-        readerDao = BaseDao.getDao(ReaderDaoImpl.class);
-    }
-
-    public static ReaderService getInstance() {
-        if (readerService == null) {
-            readerService = new ReaderService();
-        }
-        return readerService;
-    }
-
     public void addRecords(String[] emails, String[] names, String[] periods, int bookId) {
         List<ReaderEntity> readerEntities = getReaderEntities(emails, names);
         List<RecordEntity> recordEntities = getRecordEntities(readerEntities, periods, bookId);
 
-        createReadersRecords(readerEntities, recordEntities);
+        createReaderRecords(readerEntities, recordEntities);
     }
 
     public List<RecordDto> getRecords(int bookId) {
@@ -76,22 +73,65 @@ public class ReaderService {
         return recordEntities;
     }
 
-    private void createReadersRecords(List<ReaderEntity> readerEntities, List<RecordEntity> recordEntities) {
+    private void createReaderRecords(List<ReaderEntity> readerEntities, List<RecordEntity> recordEntities) {
+        Connection connection = connectionPool.getConnection();
+        setAutoCommit(connection, false);
         for (int i = 0; i < readerEntities.size(); i++) {
-            Optional<ReaderEntity> readerByEmailOptional = readerDao.getByEmail(readerEntities.get(i).getEmail());
-            ReaderEntity readerEntity;
-            RecordEntity recordEntity = recordEntities.get(i);
-            if (readerByEmailOptional.isEmpty()) {
-                readerEntity = readerDao.create(readerEntities.get(i));
-            } else {
-                readerEntity = readerByEmailOptional.get();
+            try {
+                manageReaderRecord(readerEntities.get(i), recordEntities.get(i), connection);
+                commit(connection);
+            } catch (SQLException e) {
+                rollback(connection);
+                log.error(e);
             }
-            recordEntity.getReader().setId(readerEntity.getId());
+        }
+        setAutoCommit(connection, true);
+    }
 
-            if (readerDao.getByEmailInCurrentBook(readerEntity.getEmail(), recordEntities.get(i).getBookId()).isEmpty()) {
-                recordDao.create(recordEntity);
-                bookDao.takeBook(recordEntity.getBookId());
+    private void manageReaderRecord(ReaderEntity readerEntity, RecordEntity recordEntity, Connection connection) throws SQLException {
+        Optional<ReaderEntity> readerByEmailOptional = readerDao.getByEmail(readerEntity.getEmail(), connection);
+
+        if (readerByEmailOptional.isEmpty()) {
+            readerEntity = readerDao.create(readerEntity, connection);
+        } else {
+            readerEntity = readerByEmailOptional.get();
+        }
+        recordEntity.getReader().setId(readerEntity.getId());
+
+        if (readerDao.getByEmailInCurrentBook(readerEntity.getEmail(), recordEntity.getBookId(), connection).isEmpty()) {
+            recordDao.create(recordEntity, connection);
+            try {
+                bookDao.takeBook(recordEntity.getBookId(), connection);
+                commit(connection);
+            } catch (SQLException e) {
+                log.warn("No books available");
+                rollback(connection);
             }
         }
     }
+
+    private void setAutoCommit(Connection connection, boolean autoCommit) {
+        try {
+            connection.setAutoCommit(autoCommit);
+        } catch (SQLException e) {
+            log.error("Cannot set autoCommit", e);
+        }
+    }
+
+    private void commit(Connection connection) {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            log.error(e);
+        }
+    }
+
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            log.error(e);
+        }
+    }
 }
+

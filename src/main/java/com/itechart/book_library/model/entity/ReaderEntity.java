@@ -1,12 +1,12 @@
 package com.itechart.book_library.model.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @AllArgsConstructor
 public class ReaderEntity extends Entity {
+
     String email;
     String name;
 

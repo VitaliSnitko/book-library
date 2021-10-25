@@ -1,7 +1,6 @@
 package com.itechart.book_library.model.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -11,6 +10,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthorEntity extends Entity {
+
     private String name;
 
     public String getName() {

@@ -1,6 +1,5 @@
 package com.itechart.book_library.util.converter.impl;
 
-import com.itechart.book_library.model.dto.BookDto;
 import com.itechart.book_library.model.dto.ReaderDto;
 import com.itechart.book_library.model.entity.ReaderEntity;
 import com.itechart.book_library.util.converter.Converter;

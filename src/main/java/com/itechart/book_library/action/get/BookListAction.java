@@ -1,6 +1,8 @@
 package com.itechart.book_library.action.get;
 
 import com.itechart.book_library.action.api.Action;
+import com.itechart.book_library.action.api.ActionConstants;
+import com.itechart.book_library.action.api.ActionResult;
 import com.itechart.book_library.dao.criteria.BookSpecification;
 import com.itechart.book_library.service.BookService;
 
@@ -11,7 +13,7 @@ import java.util.Properties;
 
 public class BookListAction implements Action {
 
-    private BookService bookService = BookService.getInstance();
+    private BookService bookService = BookService.INSTANCE;
     private Properties applicationProperties = new Properties();
     private int bookAmountOnOnePage;
 
@@ -25,7 +27,7 @@ public class BookListAction implements Action {
     }
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
 
         int page = getPage(req);
         BookSpecification specification = getSpecification(req);
@@ -33,8 +35,7 @@ public class BookListAction implements Action {
 
         req.setAttribute("bookList", bookService.getLimitOffsetBySpecification(specification, bookAmountOnOnePage, page));
         req.setAttribute("pageAmount", Math.ceil((float) totalAmountOfBooks / bookAmountOnOnePage));
-
-        return "main";
+        return new ActionResult(ActionConstants.BOOK_LIST_PAGE);
     }
 
     private int getPage(HttpServletRequest req) {

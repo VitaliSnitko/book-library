@@ -1,8 +1,5 @@
 package com.itechart.book_library.util.converter;
 
-import com.itechart.book_library.model.dto.GenreDto;
-import com.itechart.book_library.model.entity.GenreEntity;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;

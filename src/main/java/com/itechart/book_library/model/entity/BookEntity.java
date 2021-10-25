@@ -1,8 +1,5 @@
 package com.itechart.book_library.model.entity;
 
-import com.itechart.book_library.model.dto.AuthorDto;
-import com.itechart.book_library.model.dto.GenreDto;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 

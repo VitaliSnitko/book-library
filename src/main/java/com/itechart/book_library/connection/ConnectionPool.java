@@ -1,6 +1,6 @@
 package com.itechart.book_library.connection;
 
-import java.io.*;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

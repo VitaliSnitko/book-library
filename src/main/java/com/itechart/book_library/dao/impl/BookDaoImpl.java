@@ -6,7 +6,7 @@ import com.itechart.book_library.dao.criteria.BookSpecification;
 import com.itechart.book_library.model.entity.AuthorEntity;
 import com.itechart.book_library.model.entity.BookEntity;
 import com.itechart.book_library.model.entity.GenreEntity;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,17 +14,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+@Log4j
 public class BookDaoImpl extends BaseDao implements BookDao {
 
-    private static final Logger log = Logger.getLogger(BookDaoImpl.class);
-
     private static final String INSERT_BOOK_QUERY = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover, available, total_amount) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
-    private static final String SELECT_ALL_QUERY = "SELECT * FROM book";
     private static final String SELECT_LIMIT_OFFSET_WITH_PARAMETERS_QUERY = """
             with parameters(title_p, authors_p, genres_p, description_p) as (
                 values (?, ?, ?, ?)
             )
-            select book.*, author.*, genre.*
+            select distinct book.*, author.*, genre.*
             from parameters, book
                      left join author_book on author_book.book_id = book.id
                      left join author on author_book.author_id = author.id
@@ -46,15 +44,6 @@ public class BookDaoImpl extends BaseDao implements BookDao {
                                 and description ~* description_p
                               order by book.id desc
                               limit ? offset ?);""";
-    private static final String SELECT_LIMIT_OFFSET_QUERY = """
-            select book.*, author.*, genre.*
-            from book
-                     left join author_book on author_book.book_id = book.id
-                     left join author on author_book.author_id = author.id
-                     left join genre_book on genre_book.book_id = book.id
-                     left join genre on genre_book.genre_id = genre.id
-            where book.id in
-            (select book.id from book order by book.id desc limit ? offset ?)""";
     private static final String SELECT_BY_ID_QUERY = """
             select book.*, author.*, genre.*
             from book
@@ -66,7 +55,6 @@ public class BookDaoImpl extends BaseDao implements BookDao {
     private static final String UPDATE_QUERY = "UPDATE book SET title = ?, publisher = ?, publish_date = ?, page_count = ?, isbn = ?, description = ?, cover = COALESCE(?, cover), available = ? - total_amount + available, total_amount = ? WHERE id = ?";
     private static final StringBuilder TEMPLATE_DELETE_QUERY = new StringBuilder("DELETE FROM book WHERE id IN(?");
     private static StringBuilder DELETE_QUERY = TEMPLATE_DELETE_QUERY;
-    private static final String SELECT_BOOK_COUNT = "SELECT COUNT(*) FROM book";
     private static final String SELECT_BOOK_COUNT_WITH_PARAMETERS = """
             select count(DISTINCT book.id) from
             book
@@ -79,14 +67,9 @@ public class BookDaoImpl extends BaseDao implements BookDao {
               and genre.name ~* ?
               and description ~* ?;""";
     private static final String UPDATE_TAKE_BOOK_QUERY = "UPDATE book SET available = available-1 WHERE id = ?";
-    private static final String SELECT_BY_TITLE_QUERY = "SELECT * FROM book WHERE title = ?";
-    private static final String SELECT_BY_AUTHOR_QUERY = "SELECT * FROM book JOIN author_book ON book.id = author_book.author_id WHERE author_id = ?";
-    private static final String SELECT_BY_GENRE_QUERY = "SELECT * FROM book JOIN genre_book ON book.id = genre_book.genre_id WHERE genre_id = ?";
-    private static final String SELECT_BY_DESCRIPTION_QUERY = "SELECT * FROM book WHERE description LIKE '%?%'";
 
     @Override
-    public BookEntity create(BookEntity book) {
-        Connection connection = connectionPool.getConnection();
+    public BookEntity create(BookEntity book, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_BOOK_QUERY)) {
             int i = 1;
             statement.setString(i++, book.getTitle());
@@ -100,27 +83,8 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setInt(i++, book.getTotalBookAmount());
             statement.execute();
             book.setId(getIdAfterInserting(statement));
-        } catch (SQLException e) {
-            log.error("Cannot create book ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
         }
         return book;
-    }
-
-    @Override
-    public List<BookEntity> getLimitOffset(int limit, int offset) {
-        Connection connection = connectionPool.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(SELECT_LIMIT_OFFSET_QUERY)) {
-            statement.setInt(1, limit);
-            statement.setInt(2, offset);
-            return getBookListFromResultSet(statement.executeQuery());
-        } catch (SQLException e) {
-            log.error("Cannot get books ", e);
-            return null;
-        } finally {
-            connectionPool.returnToPool(connection);
-        }
     }
 
     @Override
@@ -137,38 +101,16 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             return getBookListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             log.error("Cannot get books ", e);
-            return null;
         } finally {
             connectionPool.returnToPool(connection);
         }
+        return new ArrayList<>();
     }
 
     @Override
     public Optional<BookEntity> getById(int id) {
         List<BookEntity> bookList = getListByKey(SELECT_BY_ID_QUERY, id);
         return bookList.isEmpty() ? Optional.empty() : Optional.of(bookList.get(0));
-    }
-
-    @Override
-    public void update(BookEntity book) {
-        Connection connection = connectionPool.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
-            int i = 1;
-            statement.setString(i++, book.getTitle());
-            statement.setString(i++, book.getPublisher());
-            statement.setDate(i++, book.getPublishDate());
-            statement.setInt(i++, book.getPageCount());
-            statement.setString(i++, book.getISBN());
-            statement.setString(i++, book.getDescription());
-            statement.setBinaryStream(i++, book.getCover());
-            statement.setInt(i++, book.getTotalBookAmount());
-            statement.setInt(i++, book.getTotalBookAmount());
-            statement.setInt(i++, book.getId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            log.error("Cannot update book ", e);
-        }
-        connectionPool.returnToPool(connection);
     }
 
     @Override
@@ -214,21 +156,6 @@ public class BookDaoImpl extends BaseDao implements BookDao {
         }
     }
 
-    public int getCount() {
-        Connection connection = connectionPool.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_COUNT)) {
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            return resultSet.getInt(1);
-        } catch (SQLException e) {
-            log.error("Cannot get count of books ", e);
-            return 0;
-        } finally {
-            connectionPool.returnToPool(connection);
-            DELETE_QUERY = TEMPLATE_DELETE_QUERY;
-        }
-    }
-
     public int getCountBySpecification(BookSpecification specification) {
         Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_COUNT_WITH_PARAMETERS)) {
@@ -248,15 +175,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
         }
     }
 
-    public void takeBook(int id) {
-        Connection connection = connectionPool.getConnection();
+    public void takeBook(int id, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_TAKE_BOOK_QUERY)) {
             statement.setInt(1, id);
             statement.executeUpdate();
-        } catch (SQLException e) {
-            log.error("Cannot get book ", e);
-        } finally {
-            connectionPool.returnToPool(connection);
         }
     }
 
@@ -273,71 +195,66 @@ public class BookDaoImpl extends BaseDao implements BookDao {
         }
     }
 
-    private List<BookEntity> getListByKey(String query, String text) {
-        Connection connection = connectionPool.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, text);
-            return getBookListFromResultSet(statement.executeQuery());
-        } catch (SQLException e) {
-            log.error("Cannot get list by " + text + " key ", e);
-            return new ArrayList<>();
-        } finally {
-            connectionPool.returnToPool(connection);
-        }
-    }
-
     private List<BookEntity> getBookListFromResultSet(ResultSet resultSet) throws SQLException {
-        int prevBookId = 0;
-        if (resultSet.next()) {
-            prevBookId = resultSet.getInt(1);
-        }
-
-        BookEntity book = getBookWithParams(resultSet);
         List<BookEntity> books = new ArrayList<>();
+        BookEntity book = new BookEntity();
         Set<AuthorEntity> authorSet = new HashSet<>();
         Set<GenreEntity> genreSet = new HashSet<>();
 
-        do {
-            if (prevBookId != resultSet.getInt(1)) {
+        int prevBookId = -1;
+        int resultSetIndex = 0;
+        while (resultSet.next()) {
+            if (prevBookId != resultSet.getInt(1) && resultSetIndex != 0) {
                 book.setAuthorEntities(new ArrayList<>(authorSet));
                 book.setGenreEntities(new ArrayList<>(genreSet));
                 authorSet.clear();
                 genreSet.clear();
                 books.add(book);
             }
-            AuthorEntity author = new AuthorEntity();
-            author.setId(resultSet.getInt(11));
-            author.setName(resultSet.getString(12));
-
-            GenreEntity genre = new GenreEntity();
-            genre.setId(resultSet.getInt(13));
-            genre.setName(resultSet.getString(14));
-
-            genreSet.add(genre);
-            authorSet.add(author);
-            book = getBookWithParams(resultSet);
+            book = getBookByResultSet(resultSet);
+            authorSet.add(getAuthorByResultSet(resultSet));
+            genreSet.add(getGenreByResultSet(resultSet));
 
             prevBookId = resultSet.getInt(1);
-        } while (resultSet.next());
+            resultSetIndex++;
+        }
+        if (resultSetIndex == 0) {
+            return books;
+        }
         book.setAuthorEntities(new ArrayList<>(authorSet));
         book.setGenreEntities(new ArrayList<>(genreSet));
         books.add(book);
         return books;
     }
 
-    private BookEntity getBookWithParams(ResultSet resultSet) throws SQLException {
-        BookEntity book = new BookEntity();
+    private BookEntity getBookByResultSet(ResultSet resultSet) throws SQLException {
         int i = 1;
-        book.setId(resultSet.getInt(i++));
-        book.setTitle(resultSet.getString(i++));
-        book.setPublisher(resultSet.getString(i++));
-        book.setPublishDate(resultSet.getDate(i++));
-        book.setPageCount(resultSet.getInt(i++));
-        book.setISBN(resultSet.getString(i++));
-        book.setDescription(resultSet.getString(i++));
-        book.setCover(resultSet.getBinaryStream(i++));
-        book.setAvailableBookAmount(resultSet.getInt(i++));
-        book.setTotalBookAmount(resultSet.getInt(i++));
-        return book;
+        return BookEntity.builder()
+                .id(resultSet.getInt(i++))
+                .title(resultSet.getString(i++))
+                .publisher(resultSet.getString(i++))
+                .publishDate(resultSet.getDate(i++))
+                .pageCount(resultSet.getInt(i++))
+                .ISBN(resultSet.getString(i++))
+                .description(resultSet.getString(i++))
+                .cover(resultSet.getBinaryStream(i++))
+                .availableBookAmount(resultSet.getInt(i++))
+                .totalBookAmount(resultSet.getInt(i++))
+                .build();
+
+    }
+
+    private AuthorEntity getAuthorByResultSet(ResultSet resultSet) throws SQLException {
+        return AuthorEntity.builder()
+                .id(resultSet.getInt(11))
+                .name(resultSet.getString(12))
+                .build();
+    }
+
+    private GenreEntity getGenreByResultSet(ResultSet resultSet) throws SQLException {
+        return GenreEntity.builder()
+                .id(resultSet.getInt(13))
+                .name(resultSet.getString(14))
+                .build();
     }
 }

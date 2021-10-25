@@ -5,19 +5,15 @@ import com.itechart.book_library.dao.api.AuthorDao;
 import com.itechart.book_library.dao.api.BaseDao;
 import com.itechart.book_library.dao.api.BookDao;
 import com.itechart.book_library.dao.api.GenreDao;
-import com.itechart.book_library.dao.impl.*;
 import com.itechart.book_library.dao.criteria.BookSpecification;
-import com.itechart.book_library.model.dto.AuthorDto;
+import com.itechart.book_library.dao.impl.*;
 import com.itechart.book_library.model.dto.BookDto;
-import com.itechart.book_library.model.dto.GenreDto;
 import com.itechart.book_library.model.entity.AuthorEntity;
 import com.itechart.book_library.model.entity.BookEntity;
 import com.itechart.book_library.model.entity.GenreEntity;
-import com.itechart.book_library.util.converter.impl.AuthorConverter;
-import com.itechart.book_library.util.converter.impl.BookConverter;
 import com.itechart.book_library.util.converter.Converter;
-import com.itechart.book_library.util.converter.impl.GenreConverter;
-import org.apache.log4j.Logger;
+import com.itechart.book_library.util.converter.impl.BookConverter;
+import lombok.extern.log4j.Log4j;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -25,9 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class BookService {
+@Log4j
+public enum BookService {
+    INSTANCE;
 
-    private static final Logger log = Logger.getLogger(BookDaoImpl.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
     private final BookDao bookDao = BaseDao.getDao(BookDaoImpl.class);
     private final AuthorDao authorDao = BaseDao.getDao(AuthorDaoImpl.class);
@@ -35,45 +32,44 @@ public class BookService {
     private final AuthorBookDaoImpl authorBookDao = BaseDao.getDao(AuthorBookDaoImpl.class);
     private final GenreBookDaoImpl genreBookDao = BaseDao.getDao(GenreBookDaoImpl.class);
     private final Converter<BookDto, BookEntity> bookConverter = new BookConverter();
-    private final Converter<AuthorDto, AuthorEntity> authorConverter = new AuthorConverter();
-    private final Converter<GenreDto, GenreEntity> genreConverter = new GenreConverter();
 
-    private static BookService bookService;
-
-    private BookService() {
-    }
-
-    public static BookService getInstance() {
-        if (bookService == null)
-            bookService = new BookService();
-        return bookService;
-    }
-
-    public void createBook(BookDto bookDto) {
+    public void create(BookDto bookDto) {
 
         BookEntity bookEntity = bookConverter.toEntity(bookDto);
+        Connection connection = connectionPool.getConnection();
+        setAutoCommit(connection, false);
+        try {
+            bookDao.create(bookEntity, connection);
+            manageAuthorsAndGenres(bookEntity, connection);
+            commit(connection);
+        } catch (SQLException e) {
+            rollback(connection);
+        }
 
-        bookDao.create(bookEntity);
-        for (AuthorEntity authorEntity : bookEntity.getAuthorEntities()) {
-            authorEntity = authorDao.create(authorEntity);
-            authorBookDao.setAuthorToBook(authorEntity.getId(), bookEntity.getId());
-        }
-        for (GenreEntity genreEntity : bookEntity.getGenreEntities()) {
-            genreEntity = genreDao.create(genreEntity);
-            genreBookDao.setGenreToBook(genreEntity.getId(), bookEntity.getId());
-        }
+        setAutoCommit(connection, true);
     }
 
-    public List<BookDto> getLimitOffset(int bookAmountOnOnePage, int page) {
-        int offset = (page - 1) * bookAmountOnOnePage;
-        List<BookEntity> bookEntityList = bookDao.getLimitOffset(bookAmountOnOnePage, offset);
-        return bookConverter.toDtos(bookEntityList);
+    public void update(BookDto bookDto) {
+        if (bookDao.getById(bookDto.getId()).isEmpty()) {
+            create(bookDto);
+            return;
+        }
+        BookEntity book = bookConverter.toEntity(bookDto);
+        Connection connection = connectionPool.getConnection();
+        setAutoCommit(connection, false);
+        try {
+            bookDao.update(book, connection);
+            manageAuthorsAndGenres(book, connection);
+            commit(connection);
+        } catch (SQLException e) {
+            rollback(connection);
+        }
+        setAutoCommit(connection, true);
     }
 
     public List<BookDto> getLimitOffsetBySpecification(BookSpecification specification, int bookAmountOnOnePage, int page) {
         int offset = (page - 1) * bookAmountOnOnePage;
-        List<BookEntity> bookEntityList = bookDao.getLimitOffsetBySpecification(specification, bookAmountOnOnePage, offset);
-        return bookConverter.toDtos(bookEntityList);
+        return bookConverter.toDtos(bookDao.getLimitOffsetBySpecification(specification, bookAmountOnOnePage, offset));
     }
 
     public BookDto getById(int id) {
@@ -82,36 +78,40 @@ public class BookService {
         return bookConverter.toDto(optionalBook.get());
     }
 
-    public void update(BookDto bookDto) {
-        BookEntity book = bookConverter.toEntity(bookDto);
-        List<AuthorEntity> authorEntityList = authorConverter.toEntities(bookDto.getAuthorDtos());
-        List<GenreEntity> genreEntityList = genreConverter.toEntities(bookDto.getGenreDtos());
-
-        Connection connection = connectionPool.getConnection();
-        setAutoCommit(connection, false);
-
-        bookDao.update(book, connection);
-        for (AuthorEntity authorEntity : authorEntityList) {
-            if (authorDao.getByName(authorEntity.getName()).isEmpty()) {
-                authorEntity = authorDao.create(authorEntity);
-                authorBookDao.setAuthorToBook(authorEntity.getId(), book.getId());
-            }
+    private void manageAuthorsAndGenres(BookEntity bookEntity, Connection connection) throws SQLException {
+        for (AuthorEntity authorEntity : bookEntity.getAuthorEntities()) {
+            manageAuthor(bookEntity, connection, authorEntity);
         }
-        for (GenreEntity genreEntity : genreEntityList) {
-            if (genreDao.getByName(genreEntity.getName()).isEmpty()) {
-                genreEntity = genreDao.create(genreEntity);
-                genreBookDao.setGenreToBook(genreEntity.getId(), book.getId());
-            }
+        for (GenreEntity genreEntity : bookEntity.getGenreEntities()) {
+            manageGenre(bookEntity, connection, genreEntity);
         }
-        commit(connection);
-        setAutoCommit(connection, true);
+    }
+
+    private void manageAuthor(BookEntity bookEntity, Connection connection, AuthorEntity authorEntity) throws SQLException {
+        Optional<AuthorEntity> optionalAuthor = authorDao.getByName(authorEntity.getName());
+        if (optionalAuthor.isEmpty()) {
+            authorEntity = authorDao.create(authorEntity, connection);
+            authorBookDao.setAuthorToBook(authorEntity.getId(), bookEntity.getId(), connection);
+        } else {
+            authorBookDao.setAuthorToBook(optionalAuthor.get().getId(), bookEntity.getId(), connection);
+        }
+    }
+
+    private void manageGenre(BookEntity bookEntity, Connection connection, GenreEntity genreEntity) throws SQLException {
+        Optional<GenreEntity> optionalGenre = genreDao.getByName(genreEntity.getName());
+        if (optionalGenre.isEmpty()) {
+            genreEntity = genreDao.create(genreEntity, connection);
+            genreBookDao.setGenreToBook(genreEntity.getId(), bookEntity.getId(), connection);
+        } else {
+            genreBookDao.setGenreToBook(optionalGenre.get().getId(), bookEntity.getId(), connection);
+        }
     }
 
     private void setAutoCommit(Connection connection, boolean autoCommit) {
         try {
             connection.setAutoCommit(autoCommit);
         } catch (SQLException e) {
-            log.error("Cannot set autoCommit", e);
+            log.error(e);
         }
     }
 
@@ -123,12 +123,16 @@ public class BookService {
         }
     }
 
-    public void delete(String[] ids) {
-        bookDao.delete(Arrays.stream(ids).map(Integer::parseInt).toArray(Integer[]::new));
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            log.error(e);
+        }
     }
 
-    public int getBookCount() {
-        return bookDao.getCount();
+    public void delete(String[] ids) {
+        bookDao.delete(Arrays.stream(ids).map(Integer::parseInt).toArray(Integer[]::new));
     }
 
     public int getBookCountBySpecification(BookSpecification specification) {

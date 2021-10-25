@@ -7,10 +7,7 @@ import com.itechart.book_library.model.entity.BookEntity;
 import com.itechart.book_library.util.converter.Converter;
 import lombok.SneakyThrows;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,6 +16,7 @@ import java.util.stream.Collectors;
 
 
 public class BookConverter extends Converter<BookDto, BookEntity> {
+
     private static AuthorConverter authorConverter = new AuthorConverter();
     private static GenreConverter genreConverter = new GenreConverter();
 

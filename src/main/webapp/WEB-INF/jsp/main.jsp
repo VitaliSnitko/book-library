@@ -62,7 +62,14 @@
                     </c:forEach>
                   </c:if>
                 </small></p>
-                <span class="badge rounded-pill bg-info"> ${bookDto.availableBookAmount} Copies in Stock</span>
+                <c:choose>
+                  <c:when test="${bookDto.availableBookAmount == 0}">
+                    <span class="badge rounded-pill bg-danger"> 0 Copies in Stock</span>
+                  </c:when>
+                  <c:otherwise>
+                    <span class="badge rounded-pill bg-info"> ${bookDto.availableBookAmount} Copies in Stock</span>
+                  </c:otherwise>
+                </c:choose>
                 <small class="publish-date text-muted"><b>Publish date:</b> ${bookDto.publishDate}
                 </small>
                 <div class="form-check">
@@ -81,7 +88,9 @@
       </div>
     </div>
   </form>
+
   <c:set var="pageAmount" value="${requestScope.pageAmount}"/>
+
   <nav aria-label="Page navigation example">
     <ul class="pagination">
       <c:if test="${param.page != null && param.page != 1}">
@@ -96,10 +105,13 @@
         <li class="page-item"><a class="page-link" href="/main?page=${pageNum}">${pageNum}</a></li>
       </c:forEach>
 
-      <c:if test="${param.page != pageAmount}">
+      <c:if test="${param.page != pageAmount && requestScope.bookList.size() != 0}">
         <c:set var="currentPage" value="${param.page}"/>
-        <c:if test="${currentPage == null}"><c:set var="currentPage" value="1"/></c:if>
+        <c:if test="${currentPage == null}">
+          <c:set var="currentPage" value="1"/>
+        </c:if>
         <li class="page-item">
+
           <a class="page-link" href="/main?page=${currentPage + 1}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>

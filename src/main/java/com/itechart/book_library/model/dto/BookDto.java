@@ -1,7 +1,5 @@
 package com.itechart.book_library.model.dto;
 
-import com.itechart.book_library.model.entity.AuthorEntity;
-import com.itechart.book_library.model.entity.GenreEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -11,9 +9,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.sql.Date;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;

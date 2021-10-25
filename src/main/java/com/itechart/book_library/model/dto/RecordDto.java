@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 @Builder
 public class RecordDto {
+
     int id;
     Date borrowDate;
     Date dueDate;

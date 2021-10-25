@@ -16,6 +16,7 @@
   <script defer src="../../js/record-modal-validation.js"></script>
   <script defer src="../../js/record-adding.js"></script>
   <script defer src="../../js/suggestion-email.js"></script>
+  <script defer src="../../js/max-file-size-upload.js"></script>
   <title>Book page</title>
 </head>
 <body>
@@ -81,8 +82,7 @@
     <div class="row mb-1 justify-content-center">
       <label for="validationCustom01" class="form-label col-sm-2 col-form-label">Title</label>
       <div class="col-sm-4">
-        <input type="text" name="title" class="form-control" id="validationCustom01" value="${bookDto.title}" required
-               pattern="[a-zA-Z0-9 ]+">
+        <input type="text" name="title" class="form-control" id="validationCustom01" value="${bookDto.title}" required>
       </div>
     </div>
     <div class="row mb-1 justify-content-center">
@@ -92,7 +92,7 @@
           <input type="text" name="authors" class="form-control" id="validationCustom02"
                  value="${bookDto.authorDtos.get(0).name}<c:if test="${bookDto.authorDtos.size() > 1}"><c:forEach var="authorEntity" items="${bookDto.authorDtos}" begin="1">, ${authorEntity.name}</c:forEach></c:if>"
                  required
-                 pattern="[a-zA-Z ]+ *(, *[a-zA-Z ]+)*">
+                 pattern="[[a-zA-Z '-]+ *(, *[a-zA-Z '-]+)*">
           <div class="invalid-feedback">
             Please, enter authors divided by ','
           </div>
@@ -105,7 +105,7 @@
         <div class="input-group has-validation">
           <input type="text" name="genres" class="form-control" id="validationCustomUsername"
                  value="${bookDto.genreDtos.get(0).name}<c:if test="${bookDto.genreDtos.size() > 1}"><c:forEach var="genreEntity" items="${bookDto.genreDtos}" begin="1">, ${genreEntity.name}</c:forEach></c:if>"
-                 aria-describedby="inputGroupPrepend" required pattern="[a-zA-Z ]+ *(, *[a-zA-Z ]+)*">
+                 aria-describedby="inputGroupPrepend" required pattern="[a-zA-Z '-]+ *(, *[a-zA-Z '-]+)*">
           <div class="invalid-feedback">
             Please, enter genres divided by ','
           </div>
@@ -115,15 +115,13 @@
     <div class="row mb-1 justify-content-center">
       <label for="validationCustom03" class="form-label col-sm-2 col-form-label">Publisher</label>
       <div class="col-sm-4">
-        <input type="text" name="publisher" class="form-control" id="validationCustom03" value="${bookDto.publisher}"
-               required pattern="[a-zA-Z0-9 ]+">
+        <input type="text" name="publisher" class="form-control" id="validationCustom03" value="${bookDto.publisher}" required>
       </div>
     </div>
     <div class="row mb-1 justify-content-center">
       <label for="validationCustom04" class="form-label col-sm-2 col-form-label">Publish date</label>
       <div class="col-sm-4">
-        <input type="date" name="date" class="form-control" id="validationCustom04" value="${bookDto.publishDate}"
-               required>
+        <input type="date" name="date" class="form-control" id="validationCustom04" value="${bookDto.publishDate}" required>
       </div>
     </div>
     <div class="row mb-1 justify-content-center">
@@ -153,9 +151,9 @@
       </div>
     </div>
     <div class="row mb-1 justify-content-center">
-      <label for="validationCustom09" class="form-label col-sm-2 col-form-label">Cover</label>
+      <label for="cover" class="form-label col-sm-2 col-form-label">Cover</label>
       <div class="col-sm-4">
-        <input class="form-control" type="file" accept="image/jpeg,image/png" name="cover" id="validationCustom09">
+        <input class="form-control" type="file" accept="image/jpeg,image/png" name="cover" id="cover">
       </div>
     </div>
     <div class="row mb-2 justify-content-center">
@@ -187,9 +185,6 @@
         <div class="list-group">
           <c:forEach var="record" items="${requestScope.records}">
             <div class="list-group-item list-group-item-action d-flex">
-              <input type="hidden" name="email" value="${record.reader.email}">
-              <input type="hidden" name="name" value="${record.reader.name}">
-              <input type="hidden" name="period" value="${record.dueDate}">
               <div class="flex-column">
                 <a href="#">${record.reader.name}</a>
                 <p><small>${record.reader.email}</small></p>
