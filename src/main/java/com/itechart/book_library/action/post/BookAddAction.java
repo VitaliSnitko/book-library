@@ -25,12 +25,11 @@ public class BookAddAction implements Action {
 
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         if (bookValidator.isValid(req)) {
             bookService.create(bookConverter.toDtoFromReq(req));
             return new ActionResult(ActionConstants.BOOK_LIST_PAGE, ActionConstants.redirect);
         } else {
-            log.warn("Non valid book parameters caught");
+            log.warn("Invalid book parameters caught");
             return new ActionResult(ActionConstants.BOOK_ADD_PAGE, ActionConstants.redirect);
         }
     }

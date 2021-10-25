@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet({"/main", "/add", "/edit", "/delete", "/add-record", "/search"})
+@WebServlet({"/main", "/add", "/edit", "/delete", "/search"})
 @MultipartConfig(maxFileSize = 2097152)
 public class FrontController extends HttpServlet {
 

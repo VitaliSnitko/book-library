@@ -15,12 +15,12 @@ public class BookListAction implements Action {
 
     private BookService bookService = BookService.INSTANCE;
     private Properties applicationProperties = new Properties();
-    private int bookAmountOnOnePage;
+    private int pageBookAmount;
 
     public BookListAction() {
         try {
             applicationProperties.load(getClass().getClassLoader().getResourceAsStream("application.properties"));
-            bookAmountOnOnePage = Integer.parseInt(applicationProperties.getProperty("book-amount-on-one-page"));
+            pageBookAmount = Integer.parseInt(applicationProperties.getProperty("book-amount-on-one-page"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -28,13 +28,12 @@ public class BookListAction implements Action {
 
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
-
         int page = getPage(req);
         BookSpecification specification = getSpecification(req);
-        int totalAmountOfBooks = bookService.getBookCountBySpecification(specification);
+        int totalBookAmount = bookService.getBookCountBySpecification(specification);
 
-        req.setAttribute("bookList", bookService.getLimitOffsetBySpecification(specification, bookAmountOnOnePage, page));
-        req.setAttribute("pageAmount", Math.ceil((float) totalAmountOfBooks / bookAmountOnOnePage));
+        req.setAttribute("bookList", bookService.getLimitOffsetBySpecification(specification, this.pageBookAmount, page));
+        req.setAttribute("pageAmount", Math.ceil((float) totalBookAmount / this.pageBookAmount));
         return new ActionResult(ActionConstants.BOOK_LIST_PAGE);
     }
 

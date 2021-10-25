@@ -40,13 +40,14 @@ public enum BookService {
         setAutoCommit(connection, false);
         try {
             bookDao.create(bookEntity, connection);
-            manageAuthorsAndGenres(bookEntity, connection);
+            persistAuthorsAndGenres(bookEntity, connection);
             commit(connection);
         } catch (SQLException e) {
             rollback(connection);
         }
 
         setAutoCommit(connection, true);
+        connectionPool.returnToPool(connection);
     }
 
     public void update(BookDto bookDto) {
@@ -59,12 +60,13 @@ public enum BookService {
         setAutoCommit(connection, false);
         try {
             bookDao.update(book, connection);
-            manageAuthorsAndGenres(book, connection);
+            persistAuthorsAndGenres(book, connection);
             commit(connection);
         } catch (SQLException e) {
             rollback(connection);
         }
         setAutoCommit(connection, true);
+        connectionPool.returnToPool(connection);
     }
 
     public List<BookDto> getLimitOffsetBySpecification(BookSpecification specification, int bookAmountOnOnePage, int page) {
@@ -78,16 +80,16 @@ public enum BookService {
         return bookConverter.toDto(optionalBook.get());
     }
 
-    private void manageAuthorsAndGenres(BookEntity bookEntity, Connection connection) throws SQLException {
+    private void persistAuthorsAndGenres(BookEntity bookEntity, Connection connection) throws SQLException {
         for (AuthorEntity authorEntity : bookEntity.getAuthorEntities()) {
-            manageAuthor(bookEntity, connection, authorEntity);
+            persistAuthor(bookEntity, connection, authorEntity);
         }
         for (GenreEntity genreEntity : bookEntity.getGenreEntities()) {
-            manageGenre(bookEntity, connection, genreEntity);
+            persistGenre(bookEntity, connection, genreEntity);
         }
     }
 
-    private void manageAuthor(BookEntity bookEntity, Connection connection, AuthorEntity authorEntity) throws SQLException {
+    private void persistAuthor(BookEntity bookEntity, Connection connection, AuthorEntity authorEntity) throws SQLException {
         Optional<AuthorEntity> optionalAuthor = authorDao.getByName(authorEntity.getName());
         if (optionalAuthor.isEmpty()) {
             authorEntity = authorDao.create(authorEntity, connection);
@@ -97,7 +99,7 @@ public enum BookService {
         }
     }
 
-    private void manageGenre(BookEntity bookEntity, Connection connection, GenreEntity genreEntity) throws SQLException {
+    private void persistGenre(BookEntity bookEntity, Connection connection, GenreEntity genreEntity) throws SQLException {
         Optional<GenreEntity> optionalGenre = genreDao.getByName(genreEntity.getName());
         if (optionalGenre.isEmpty()) {
             genreEntity = genreDao.create(genreEntity, connection);

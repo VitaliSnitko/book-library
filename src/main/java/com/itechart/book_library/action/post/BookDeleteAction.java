@@ -17,9 +17,7 @@ public class BookDeleteAction implements Action {
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String[] ids = req.getParameterValues("delete");
-
         bookService.delete(ids);
-
         return new ActionResult(ActionConstants.BOOK_LIST_PAGE, ActionConstants.redirect);
     }
 }

@@ -6,8 +6,8 @@ public enum BookFormValidator implements Validator {
     INSTANCE;
 
     private static final String titlePattern = ".+";
-    private static final String authorsPattern = "[a-zA-Z '-]+ *(, *[a-zA-Z '-]+)*";
-    private static final String genresPattern = "[a-zA-Z '-]+ *(, *[a-zA-Z '-]+)*";
+    private static final String authorsPattern = ".+ *(, *.+)*";
+    private static final String genresPattern = ".+ *(, *.+)*";
     private static final String publisherPattern = ".+";
     private static final String publishDatePattern = ".+";
     private static final String pageCountPattern = "\\d+";

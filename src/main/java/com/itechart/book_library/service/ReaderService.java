@@ -86,6 +86,7 @@ public enum ReaderService {
             }
         }
         setAutoCommit(connection, true);
+        connectionPool.returnToPool(connection);
     }
 
     private void manageReaderRecord(ReaderEntity readerEntity, RecordEntity recordEntity, Connection connection) throws SQLException {
