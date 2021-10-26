@@ -22,9 +22,8 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
     private static final String SELECT_BY_EMAIL_QUERY = "SELECT * FROM reader WHERE email = ?";
     private static final String SELECT_BY_EMAIL_AND_BOOK_QUERY = """
             SELECT reader.* FROM reader
-            join record on reader.id = record.reader_id
-            WHERE email = ? and record.book_id = ?;""";
-    private static final String UPDATE_QUERY = "UPDATE reader SET first_name = ? WHERE id = ?";
+            JOIN record ON reader.id = record.reader_id
+            WHERE email = ? AND record.book_id = ?;""";
 
     @Override
     public ReaderEntity create(ReaderEntity reader, Connection connection) throws SQLException {
@@ -63,12 +62,10 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
 
     @Override
     public void update(ReaderEntity entity, Connection connection) {
-
     }
 
     @Override
     public void delete(Integer[] ids) {
-
     }
 
     public Optional<ReaderEntity> getByEmail(String email, Connection connection) {

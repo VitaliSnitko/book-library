@@ -15,6 +15,6 @@ public class AuthorConverter extends Converter<AuthorDto, AuthorEntity> {
     }
 
     private static AuthorEntity convertToEntity(AuthorDto authorDto) {
-        return new AuthorEntity(authorDto.getName());
+        return AuthorEntity.builder().name(authorDto.getName()).build();
     }
 }

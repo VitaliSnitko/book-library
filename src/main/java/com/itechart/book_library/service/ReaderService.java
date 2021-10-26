@@ -39,7 +39,6 @@ public enum ReaderService {
     public void addRecords(String[] emails, String[] names, String[] periods, int bookId) {
         List<ReaderEntity> readerEntities = getReaderEntities(emails, names);
         List<RecordEntity> recordEntities = getRecordEntities(readerEntities, periods, bookId);
-
         createReaderRecords(readerEntities, recordEntities);
     }
 
@@ -54,7 +53,7 @@ public enum ReaderService {
     private List<ReaderEntity> getReaderEntities(String[] emails, String[] names) {
         List<ReaderEntity> readerEntities = new ArrayList<>();
         for (int i = 0; i < emails.length; i++) {
-            readerEntities.add(new ReaderEntity(emails[i], names[i]));
+            readerEntities.add(ReaderEntity.builder().email(emails[i]).name(names[i]).build());
         }
         return readerEntities;
     }
@@ -78,7 +77,7 @@ public enum ReaderService {
         setAutoCommit(connection, false);
         for (int i = 0; i < readerEntities.size(); i++) {
             try {
-                manageReaderRecord(readerEntities.get(i), recordEntities.get(i), connection);
+                saveReaderRecord(readerEntities.get(i), recordEntities.get(i), connection);
                 commit(connection);
             } catch (SQLException e) {
                 rollback(connection);
@@ -89,7 +88,7 @@ public enum ReaderService {
         connectionPool.returnToPool(connection);
     }
 
-    private void manageReaderRecord(ReaderEntity readerEntity, RecordEntity recordEntity, Connection connection) throws SQLException {
+    private void saveReaderRecord(ReaderEntity readerEntity, RecordEntity recordEntity, Connection connection) throws SQLException {
         Optional<ReaderEntity> readerByEmailOptional = readerDao.getByEmail(readerEntity.getEmail(), connection);
 
         if (readerByEmailOptional.isEmpty()) {
@@ -103,7 +102,6 @@ public enum ReaderService {
             recordDao.create(recordEntity, connection);
             try {
                 bookDao.takeBook(recordEntity.getBookId(), connection);
-                commit(connection);
             } catch (SQLException e) {
                 log.warn("No books available");
                 rollback(connection);

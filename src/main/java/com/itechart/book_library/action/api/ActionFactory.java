@@ -15,7 +15,7 @@ import java.util.Map;
 public class ActionFactory {
 
     private final Map<String, Action> actionPerURL;
-    private static ActionFactory actionFactory;
+    private static volatile ActionFactory instance;
 
     private ActionFactory() {
         actionPerURL = new HashMap<>();
@@ -31,9 +31,16 @@ public class ActionFactory {
     }
 
     public static ActionFactory getInstance() {
-        if (actionFactory == null)
-            actionFactory = new ActionFactory();
-        return actionFactory;
+        ActionFactory localInstance = instance;
+        if (localInstance == null) {
+            synchronized (ActionFactory.class) {
+                localInstance = instance;
+                if (localInstance == null) {
+                    instance = localInstance = new ActionFactory();
+                }
+            }
+        }
+        return localInstance;
     }
 
     public Action getAction(HttpServletRequest req) {

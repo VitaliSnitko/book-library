@@ -1,31 +1,13 @@
 package com.itechart.book_library.model.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class ReaderDto {
 
     int id;
     String email;
     String name;
-
-    public int getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

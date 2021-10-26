@@ -13,14 +13,15 @@ import java.util.Properties;
 
 public class BookListAction implements Action {
 
-    private BookService bookService = BookService.INSTANCE;
-    private Properties applicationProperties = new Properties();
+    private final BookService bookService = BookService.INSTANCE;
     private int pageBookAmount;
+    private static final int DEFAULT_PAGE_NUM = 1;
 
     public BookListAction() {
         try {
+            Properties applicationProperties = new Properties();
             applicationProperties.load(getClass().getClassLoader().getResourceAsStream("application.properties"));
-            pageBookAmount = Integer.parseInt(applicationProperties.getProperty("book-amount-on-one-page"));
+            this.pageBookAmount = Integer.parseInt(applicationProperties.getProperty("book-amount-on-one-page"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,7 +39,7 @@ public class BookListAction implements Action {
     }
 
     private int getPage(HttpServletRequest req) {
-        return (req.getParameter("page") == null) ? 1 : Integer.parseInt(req.getParameter("page"));
+        return (req.getParameter("page") == null) ? DEFAULT_PAGE_NUM : Integer.parseInt(req.getParameter("page"));
     }
 
     private BookSpecification getSpecification(HttpServletRequest req) {
@@ -50,5 +51,4 @@ public class BookListAction implements Action {
                 .build()
                 .convertSpecificationParametersToRegex();
     }
-
 }

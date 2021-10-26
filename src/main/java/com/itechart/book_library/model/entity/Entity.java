@@ -1,13 +1,11 @@
 package com.itechart.book_library.model.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
 @SuperBuilder
-@NoArgsConstructor
 @AllArgsConstructor
 public abstract class Entity {
 

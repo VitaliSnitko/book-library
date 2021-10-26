@@ -26,7 +26,7 @@ public class RecordDaoImpl extends BaseDao {
              where book.id = ?
             """;
 
-    public RecordEntity create(RecordEntity recordEntity, Connection connection) {
+    public RecordEntity create(RecordEntity recordEntity, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
             statement.setInt(1, recordEntity.getBookId());
             statement.setInt(2, recordEntity.getReader().getId());
@@ -34,8 +34,6 @@ public class RecordDaoImpl extends BaseDao {
             statement.setDate(4, recordEntity.getDueDate());
             statement.execute();
             recordEntity.setId(getIdAfterInserting(statement));
-        } catch (SQLException e) {
-            log.error("Cannot create record ", e);
         }
         return recordEntity;
     }
@@ -47,7 +45,7 @@ public class RecordDaoImpl extends BaseDao {
             return getRecordListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             log.error("Cannot get books ", e);
-            return null;
+            return new ArrayList<>();
         } finally {
             connectionPool.returnToPool(connection);
         }

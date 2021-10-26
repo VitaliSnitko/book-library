@@ -22,6 +22,7 @@ public class BookPageAction implements Action {
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
         BookDto bookDto = bookService.getById(Integer.parseInt(req.getParameter("id")));
         List<RecordDto> records = readerService.getRecords(Integer.parseInt(req.getParameter("id")));
+
         req.setAttribute("records", records);
         req.setAttribute("suggestions", readerService.getAllReaders().stream().map(ReaderDto::getEmail).toArray());
         req.setAttribute("bookDto", bookDto);

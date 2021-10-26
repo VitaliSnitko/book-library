@@ -17,7 +17,10 @@ import java.util.*;
 @Log4j
 public class BookDaoImpl extends BaseDao implements BookDao {
 
-    private static final String INSERT_BOOK_QUERY = "INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover, available, total_amount) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+    private static final String INSERT_BOOK_QUERY = """
+            INSERT INTO book (id, title, publisher, publish_date, page_count, isbn, description, cover, available, total_amount)
+            VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            RETURNING id""";
     private static final String SELECT_LIMIT_OFFSET_WITH_PARAMETERS_QUERY = """
             with parameters(title_p, authors_p, genres_p, description_p) as (
                 values (?, ?, ?, ?)
@@ -52,9 +55,18 @@ public class BookDaoImpl extends BaseDao implements BookDao {
                      left join genre_book on genre_book.book_id = book.id
                      left join genre on genre_book.genre_id = genre.id
             where book.id = ?""";
-    private static final String UPDATE_QUERY = "UPDATE book SET title = ?, publisher = ?, publish_date = ?, page_count = ?, isbn = ?, description = ?, cover = COALESCE(?, cover), available = ? - total_amount + available, total_amount = ? WHERE id = ?";
-    private static final StringBuilder TEMPLATE_DELETE_QUERY = new StringBuilder("DELETE FROM book WHERE id IN(?");
-    private static StringBuilder DELETE_QUERY = TEMPLATE_DELETE_QUERY;
+    private static final String UPDATE_QUERY = """
+            UPDATE book
+            SET title        = ?,
+                publisher    = ?,
+                publish_date = ?,
+                page_count   = ?,
+                isbn         = ?,
+                description  = ?,
+                cover        = COALESCE(?, cover),
+                available    = ? - total_amount + available,
+                total_amount = ?
+            WHERE id = ?""";
     private static final String SELECT_BOOK_COUNT_WITH_PARAMETERS = """
             select count(DISTINCT book.id) from
             book
@@ -67,6 +79,8 @@ public class BookDaoImpl extends BaseDao implements BookDao {
               and genre.name ~* ?
               and description ~* ?;""";
     private static final String UPDATE_TAKE_BOOK_QUERY = "UPDATE book SET available = available-1 WHERE id = ?";
+    private static final StringBuilder TEMPLATE_DELETE_QUERY = new StringBuilder("DELETE FROM book WHERE id IN(?");
+    private static StringBuilder DELETE_QUERY = TEMPLATE_DELETE_QUERY;
 
     @Override
     public BookEntity create(BookEntity book, Connection connection) throws SQLException {
@@ -114,7 +128,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
     }
 
     @Override
-    public void update(BookEntity book, Connection connection) {
+    public void update(BookEntity book, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
             int i = 1;
             statement.setString(i++, book.getTitle());
@@ -128,13 +142,6 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setInt(i++, book.getTotalBookAmount());
             statement.setInt(i++, book.getId());
             statement.executeUpdate();
-        } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                log.error(ex);
-            }
-            log.error("Cannot update book ", e);
         }
     }
 
@@ -149,7 +156,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             }
             statement.executeUpdate();
         } catch (SQLException e) {
-            log.error("Cannot delete book ", e);
+            log.error("Cannot delete books ", e);
         } finally {
             connectionPool.returnToPool(connection);
             DELETE_QUERY = TEMPLATE_DELETE_QUERY;
@@ -197,7 +204,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
     private List<BookEntity> getBookListFromResultSet(ResultSet resultSet) throws SQLException {
         List<BookEntity> books = new ArrayList<>();
-        BookEntity book = new BookEntity();
+        BookEntity book = BookEntity.builder().build();
         Set<AuthorEntity> authorSet = new HashSet<>();
         Set<GenreEntity> genreSet = new HashSet<>();
 

@@ -18,12 +18,8 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private static final Logger log = Logger.getLogger(GenreDaoImpl.class);
 
     private static final String INSERT_QUERY = "INSERT INTO genre (id, name) VALUES (DEFAULT, ?) RETURNING id";
-    private static final String SELECT_ALL_QUERY = "SELECT * FROM genre";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM genre WHERE id = ?";
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM genre WHERE name = ?";
-    private static final String UPDATE_QUERY = "UPDATE genre SET name = ? WHERE id = ?";
-    private static final String DELETE_QUERY = "DELETE FROM genre WHERE id = ?";
-    private static final String SELECT_BY_BOOK_ID_QUERY = "SELECT * FROM genre JOIN genre_book ON genre.id = genre_book.genre_id JOIN book ON genre_book.book_id = book.id WHERE book_id = ?";
 
     @Override
     public GenreEntity create(GenreEntity genre, Connection connection) throws SQLException {
@@ -56,12 +52,6 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
         return rsList.isEmpty() ? Optional.empty() : Optional.of(rsList.get(0));
     }
 
-    @Override
-    public List<GenreEntity> getByBookId(int id) {
-        return getListByKey(SELECT_BY_BOOK_ID_QUERY, id);
-    }
-
-
     private List<GenreEntity> getListByKey(String query, int id) {
         Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -69,7 +59,7 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
             return getListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             log.error("Cannot get list by " + id + " key ", e);
-            return null;
+            return new ArrayList<>();
         } finally {
             connectionPool.returnToPool(connection);
         }
@@ -82,7 +72,7 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
             return getListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
             log.error("Cannot get list by " + text + " key ", e);
-            return null;
+            return new ArrayList<>();
         } finally {
             connectionPool.returnToPool(connection);
         }
@@ -91,10 +81,10 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private List<GenreEntity> getListFromResultSet(ResultSet resultSet) throws SQLException {
         List<GenreEntity> genreEntities = new ArrayList<>();
         while (resultSet.next()) {
-            GenreEntity genreEntity = new GenreEntity();
-            genreEntity.setId(resultSet.getInt(1));
-            genreEntity.setName(resultSet.getString(2));
-            genreEntities.add(genreEntity);
+            genreEntities.add(GenreEntity.builder()
+                    .id(resultSet.getInt(1))
+                    .name(resultSet.getString(2))
+                    .build());
         }
         return genreEntities;
     }

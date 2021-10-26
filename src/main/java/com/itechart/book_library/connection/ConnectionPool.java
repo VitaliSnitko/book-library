@@ -10,7 +10,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class ConnectionPool {
 
-    private static ConnectionPool connectionPool;
+    private static volatile ConnectionPool connectionPool;
 
     private BlockingQueue<Connection> connections;
     private String url;
@@ -25,9 +25,16 @@ public class ConnectionPool {
     }
 
     public static ConnectionPool getInstance() {
-        if (connectionPool == null)
-            connectionPool = new ConnectionPool();
-        return connectionPool;
+        ConnectionPool localInstance = connectionPool;
+        if (localInstance == null) {
+            synchronized (ConnectionPool.class) {
+                localInstance = connectionPool;
+                if (localInstance == null) {
+                    connectionPool = localInstance = new ConnectionPool();
+                }
+            }
+        }
+        return localInstance;
     }
 
     private void loadDBProperties() {
@@ -43,7 +50,6 @@ public class ConnectionPool {
         password = properties.getProperty("password");
         driver = properties.getProperty("driver");
         connectionsLimit = Integer.parseInt(properties.getProperty("connections.limit"));
-
     }
 
     private void init() {
@@ -80,5 +86,4 @@ public class ConnectionPool {
             e.printStackTrace();
         }
     }
-
 }

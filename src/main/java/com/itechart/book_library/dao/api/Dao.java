@@ -12,7 +12,7 @@ public interface Dao<T extends Entity> {
 
     Optional<T> getById(int id);
 
-    void update(T entity, Connection connection);
+    void update(T entity, Connection connection) throws SQLException;
 
     void delete(Integer[] ids);
 

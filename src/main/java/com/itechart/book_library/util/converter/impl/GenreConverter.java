@@ -15,6 +15,6 @@ public class GenreConverter extends Converter<GenreDto, GenreEntity> {
     }
 
     private static GenreEntity convertToEntity(GenreDto genreDto) {
-        return new GenreEntity(genreDto.getName());
+        return GenreEntity.builder().name(genreDto.getName()).build();
     }
 }

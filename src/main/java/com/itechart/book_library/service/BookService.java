@@ -40,7 +40,7 @@ public enum BookService {
         setAutoCommit(connection, false);
         try {
             bookDao.create(bookEntity, connection);
-            persistAuthorsAndGenres(bookEntity, connection);
+            saveAuthorsAndGenres(bookEntity, connection);
             commit(connection);
         } catch (SQLException e) {
             rollback(connection);
@@ -60,7 +60,7 @@ public enum BookService {
         setAutoCommit(connection, false);
         try {
             bookDao.update(book, connection);
-            persistAuthorsAndGenres(book, connection);
+            saveAuthorsAndGenres(book, connection);
             commit(connection);
         } catch (SQLException e) {
             rollback(connection);
@@ -80,16 +80,16 @@ public enum BookService {
         return bookConverter.toDto(optionalBook.get());
     }
 
-    private void persistAuthorsAndGenres(BookEntity bookEntity, Connection connection) throws SQLException {
+    private void saveAuthorsAndGenres(BookEntity bookEntity, Connection connection) throws SQLException {
         for (AuthorEntity authorEntity : bookEntity.getAuthorEntities()) {
-            persistAuthor(bookEntity, connection, authorEntity);
+            saveAuthor(bookEntity, connection, authorEntity);
         }
         for (GenreEntity genreEntity : bookEntity.getGenreEntities()) {
-            persistGenre(bookEntity, connection, genreEntity);
+            saveGenre(bookEntity, connection, genreEntity);
         }
     }
 
-    private void persistAuthor(BookEntity bookEntity, Connection connection, AuthorEntity authorEntity) throws SQLException {
+    private void saveAuthor(BookEntity bookEntity, Connection connection, AuthorEntity authorEntity) throws SQLException {
         Optional<AuthorEntity> optionalAuthor = authorDao.getByName(authorEntity.getName());
         if (optionalAuthor.isEmpty()) {
             authorEntity = authorDao.create(authorEntity, connection);
@@ -99,7 +99,7 @@ public enum BookService {
         }
     }
 
-    private void persistGenre(BookEntity bookEntity, Connection connection, GenreEntity genreEntity) throws SQLException {
+    private void saveGenre(BookEntity bookEntity, Connection connection, GenreEntity genreEntity) throws SQLException {
         Optional<GenreEntity> optionalGenre = genreDao.getByName(genreEntity.getName());
         if (optionalGenre.isEmpty()) {
             genreEntity = genreDao.create(genreEntity, connection);
