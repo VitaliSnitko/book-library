@@ -4,11 +4,12 @@ import com.itechart.book_library.action.api.Action;
 import com.itechart.book_library.action.api.ActionConstants;
 import com.itechart.book_library.action.api.ActionResult;
 import com.itechart.book_library.model.dto.BookDto;
-import com.itechart.book_library.model.entity.BookEntity;
 import com.itechart.book_library.service.BookService;
 import com.itechart.book_library.service.ReaderService;
-import com.itechart.book_library.util.converter.Converter;
-import com.itechart.book_library.util.converter.impl.BookConverter;
+import com.itechart.book_library.util.converter.api.BookConverter;
+import com.itechart.book_library.util.converter.api.RecordConverter;
+import com.itechart.book_library.util.converter.impl.BookConverterImpl;
+import com.itechart.book_library.util.converter.impl.RecordConverterImpl;
 import com.itechart.book_library.util.validator.BookFormValidator;
 import com.itechart.book_library.util.validator.ReaderValidator;
 import lombok.extern.log4j.Log4j;
@@ -23,9 +24,10 @@ public class BookEditAction implements Action {
 
     BookService bookService = BookService.INSTANCE;
     ReaderService readerService = ReaderService.INSTANCE;
-    private final Converter<BookDto, BookEntity> bookConverter = new BookConverter();
+    private final BookConverter bookConverter = new BookConverterImpl();
     private final BookFormValidator bookValidator = BookFormValidator.INSTANCE;
     private final ReaderValidator readerValidator = ReaderValidator.INSTANCE;
+    private final RecordConverter recordConverter = new RecordConverterImpl();
 
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -38,6 +40,8 @@ public class BookEditAction implements Action {
         BookDto bookDto = bookConverter.toDtoFromReq(req);
         bookService.update(bookDto);
 
+        updateRecords(req);
+
         if (recordsWereAdded(req)) {
             if (readerValidator.isValid(req)) {
                 addRecords(req, bookDto);
@@ -48,6 +52,12 @@ public class BookEditAction implements Action {
         }
 
         return new ActionResult(ActionConstants.BOOK_LIST_PAGE, ActionConstants.redirect);
+    }
+
+    private void updateRecords(HttpServletRequest req) {
+        if (req.getParameterValues("recordId") != null) {
+            readerService.updateRecords(recordConverter.toDtosFromReq(req));
+        }
     }
 
     private void addRecords(HttpServletRequest req, BookDto bookDto) {

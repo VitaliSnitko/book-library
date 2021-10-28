@@ -11,8 +11,8 @@ import com.itechart.book_library.model.dto.BookDto;
 import com.itechart.book_library.model.entity.AuthorEntity;
 import com.itechart.book_library.model.entity.BookEntity;
 import com.itechart.book_library.model.entity.GenreEntity;
-import com.itechart.book_library.util.converter.Converter;
-import com.itechart.book_library.util.converter.impl.BookConverter;
+import com.itechart.book_library.util.converter.api.BookConverter;
+import com.itechart.book_library.util.converter.impl.BookConverterImpl;
 import lombok.extern.log4j.Log4j;
 
 import java.sql.Connection;
@@ -31,7 +31,7 @@ public enum BookService {
     private final GenreDao genreDao = BaseDao.getDao(GenreDaoImpl.class);
     private final AuthorBookDaoImpl authorBookDao = BaseDao.getDao(AuthorBookDaoImpl.class);
     private final GenreBookDaoImpl genreBookDao = BaseDao.getDao(GenreBookDaoImpl.class);
-    private final Converter<BookDto, BookEntity> bookConverter = new BookConverter();
+    private final BookConverter bookConverter = new BookConverterImpl();
 
     public void create(BookDto bookDto) {
 
@@ -81,12 +81,18 @@ public enum BookService {
     }
 
     private void saveAuthorsAndGenres(BookEntity bookEntity, Connection connection) throws SQLException {
+        removeAuthorsAndGenresFromBook(bookEntity, connection);
         for (AuthorEntity authorEntity : bookEntity.getAuthorEntities()) {
             saveAuthor(bookEntity, connection, authorEntity);
         }
         for (GenreEntity genreEntity : bookEntity.getGenreEntities()) {
             saveGenre(bookEntity, connection, genreEntity);
         }
+    }
+
+    private void removeAuthorsAndGenresFromBook(BookEntity bookEntity, Connection connection) throws SQLException {
+        authorBookDao.removeAuthorsFromBook(bookEntity.getId(), connection);
+        genreBookDao.removeGenresFromBook(bookEntity.getId(), connection);
     }
 
     private void saveAuthor(BookEntity bookEntity, Connection connection, AuthorEntity authorEntity) throws SQLException {

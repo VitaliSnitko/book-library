@@ -4,51 +4,35 @@ import com.itechart.book_library.model.dto.AuthorDto;
 import com.itechart.book_library.model.dto.BookDto;
 import com.itechart.book_library.model.dto.GenreDto;
 import com.itechart.book_library.model.entity.BookEntity;
-import com.itechart.book_library.util.converter.Converter;
+import com.itechart.book_library.util.converter.api.AuthorConverter;
+import com.itechart.book_library.util.converter.api.BookConverter;
+import com.itechart.book_library.util.converter.api.GenreConverter;
 import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
 import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.stream.Collectors;
 
 
-public class BookConverter extends Converter<BookDto, BookEntity> {
+public class BookConverterImpl implements BookConverter {
 
-    private static AuthorConverter authorConverter = new AuthorConverter();
-    private static GenreConverter genreConverter = new GenreConverter();
+    private final AuthorConverter authorConverter = new AuthorConverterImpl();
+    private final GenreConverter genreConverter = new GenreConverterImpl();
 
-    public BookConverter() {
-        super(BookConverter::convertToEntity, BookConverter::convertToDto, BookConverter::convertToDtoFromReq);
-    }
-
-    private static BookDto convertToDto(BookEntity bookEntity) {
-        return new BookDto(
-                bookEntity.getId(),
-                bookEntity.getTitle(),
-                authorConverter.toDtos(bookEntity.getAuthorEntities()),
-                genreConverter.toDtos(bookEntity.getGenreEntities()),
-                bookEntity.getPublisher(),
-                bookEntity.getPublishDate(),
-                bookEntity.getPageCount(),
-                bookEntity.getISBN(),
-                bookEntity.getDescription(),
-                bookEntity.getCover(),
-                bookEntity.getAvailableBookAmount(),
-                bookEntity.getTotalBookAmount());
-
-    }
-
-    private static BookEntity convertToEntity(BookDto bookDto) {
+    @Override
+    public BookEntity toEntity(BookDto bookDto) {
         return BookEntity.builder()
                 .id(bookDto.getId())
                 .title(bookDto.getTitle())
                 .authorEntities(authorConverter.toEntities(bookDto.getAuthorDtos()))
                 .genreEntities(genreConverter.toEntities(bookDto.getGenreDtos()))
                 .publisher(bookDto.getPublisher())
-                .publishDate(bookDto.getPublishDate())
+                .publishDate(Date.valueOf(bookDto.getPublishDate()))
                 .pageCount(bookDto.getPageCount())
                 .ISBN(bookDto.getISBN())
                 .description(bookDto.getDescription())
@@ -59,8 +43,30 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
     }
 
     @SneakyThrows
-    private static BookDto convertToDtoFromReq(HttpServletRequest req) {
+    @Override
+    public BookDto toDto(BookEntity bookEntity) {
+        InputStream cover = bookEntity.getCover();
+        String base64Cover = (cover == null) ? "" : Base64.getEncoder().encodeToString(IOUtils.toByteArray(cover));
+        return BookDto.builder()
+                .id(bookEntity.getId())
+                .title(bookEntity.getTitle())
+                .authorDtos(authorConverter.toDtos(bookEntity.getAuthorEntities()))
+                .genreDtos(genreConverter.toDtos(bookEntity.getGenreEntities()))
+                .publisher(bookEntity.getPublisher())
+                .publishDate(bookEntity.getPublishDate().toLocalDate())
+                .pageCount(bookEntity.getPageCount())
+                .ISBN(bookEntity.getISBN())
+                .description(bookEntity.getDescription())
+                .cover(cover)
+                .base64Cover(base64Cover)
+                .availableBookAmount(bookEntity.getAvailableBookAmount())
+                .totalBookAmount(bookEntity.getTotalBookAmount())
+                .build();
+    }
 
+    @SneakyThrows
+    @Override
+    public BookDto toDtoFromReq(HttpServletRequest req) {
         int totalBookAmount = Integer.parseInt(req.getParameter("totalBookAmount"));
         return BookDto.builder()
                 .id((req.getParameter("id") != null) ? Integer.parseInt(req.getParameter("id")) : 0)
@@ -72,7 +78,7 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
                         .map(GenreDto::new)
                         .collect(Collectors.toList()))
                 .publisher(req.getParameter("publisher"))
-                .publishDate(getDate(req.getParameter("date")))
+                .publishDate(LocalDate.parse(req.getParameter("date")))
                 .pageCount(Integer.parseInt(req.getParameter("pageCount")))
                 .ISBN(req.getParameter("ISBN"))
                 .description(req.getParameter("description"))
@@ -82,15 +88,5 @@ public class BookConverter extends Converter<BookDto, BookEntity> {
                 .availableBookAmount(totalBookAmount)
                 .totalBookAmount(totalBookAmount)
                 .build();
-    }
-
-    private static Date getDate(String stringDate) {
-        java.util.Date utilDate = null;
-        try {
-            utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(stringDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return new java.sql.Date(utilDate.getTime());
     }
 }

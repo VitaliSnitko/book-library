@@ -3,11 +3,9 @@ package com.itechart.book_library.action.post;
 import com.itechart.book_library.action.api.Action;
 import com.itechart.book_library.action.api.ActionConstants;
 import com.itechart.book_library.action.api.ActionResult;
-import com.itechart.book_library.model.dto.BookDto;
-import com.itechart.book_library.model.entity.BookEntity;
 import com.itechart.book_library.service.BookService;
-import com.itechart.book_library.util.converter.Converter;
-import com.itechart.book_library.util.converter.impl.BookConverter;
+import com.itechart.book_library.util.converter.api.BookConverter;
+import com.itechart.book_library.util.converter.impl.BookConverterImpl;
 import com.itechart.book_library.util.validator.BookFormValidator;
 import lombok.extern.log4j.Log4j;
 
@@ -20,7 +18,7 @@ import java.io.IOException;
 public class BookAddAction implements Action {
 
     BookService bookService = BookService.INSTANCE;
-    private final Converter<BookDto, BookEntity> bookConverter = new BookConverter();
+    private final BookConverter bookConverter = new BookConverterImpl();
     private final BookFormValidator bookValidator = BookFormValidator.INSTANCE;
 
     @Override

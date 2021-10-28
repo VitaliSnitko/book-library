@@ -15,4 +15,7 @@ public interface BookDao extends Dao<BookEntity> {
 
     void takeBook(int id, Connection connection) throws SQLException;
 
+    void loseBook(int id, Connection connection) throws SQLException;
+
+    void returnBook(int id, Connection connection) throws SQLException;
 }

@@ -79,6 +79,8 @@ public class BookDaoImpl extends BaseDao implements BookDao {
               and genre.name ~* ?
               and description ~* ?;""";
     private static final String UPDATE_TAKE_BOOK_QUERY = "UPDATE book SET available = available-1 WHERE id = ?";
+    private static final String UPDATE_LOSE_BOOK_QUERY = "UPDATE book SET total_amount = total_amount-1 WHERE id = ?";
+    private static final String UPDATE_RETURN_BOOK_QUERY = "UPDATE book SET available = available+1 WHERE id = ?";
     private static final StringBuilder TEMPLATE_DELETE_QUERY = new StringBuilder("DELETE FROM book WHERE id IN(?");
     private static StringBuilder DELETE_QUERY = TEMPLATE_DELETE_QUERY;
 
@@ -163,6 +165,11 @@ public class BookDaoImpl extends BaseDao implements BookDao {
         }
     }
 
+    @Override
+    public void delete(Integer[] ids, Connection connection) throws SQLException {
+
+    }
+
     public int getCountBySpecification(BookSpecification specification) {
         Connection connection = connectionPool.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_BOOK_COUNT_WITH_PARAMETERS)) {
@@ -184,6 +191,20 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
     public void takeBook(int id, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_TAKE_BOOK_QUERY)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        }
+    }
+
+    public void loseBook(int id, Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_LOSE_BOOK_QUERY)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        }
+    }
+
+    public void returnBook(int id, Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_RETURN_BOOK_QUERY)) {
             statement.setInt(1, id);
             statement.executeUpdate();
         }

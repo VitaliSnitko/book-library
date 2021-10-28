@@ -6,10 +6,9 @@
             recordForm.classList.add('was-validated')
             event.preventDefault()
             event.stopImmediatePropagation()
-
         } else {
             createRecord();
-            $('#exampleModal').modal('hide');
+            $('#addModal').modal('hide');
             recordForm.reset();
             recordForm.classList.remove("was-validated")
         }

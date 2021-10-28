@@ -1,15 +1,15 @@
 let searchWrapper = document.getElementsByClassName('search-input')[0];
-let inputBox = document.getElementById('recordEmail');
+let emailAddInput = document.getElementById('recordEmail');
+let nameAddInput = document.getElementById('recordName');
 let suggBox = document.getElementsByClassName("autocom-box")[0];
-inputBox.onkeyup = (e) => {
-    let userData = e.target.value;
+emailAddInput.onkeyup = (e) => {
+    let actualInput = e.target.value;
     let emptyArray = [];
-    if (userData) {
-        emptyArray = suggestions.filter((data) => {
-            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
-        });
-        emptyArray = emptyArray.map((data) => {
-            return data = `<li>${data}</li>`;
+    if (actualInput) {
+        emptyArray = emailSuggestions.filter((data) => {
+            return data.toLocaleLowerCase().startsWith(actualInput.toLocaleLowerCase());
+        }).map((data) => {
+            return `<li>${data}</li>`;
         });
         searchWrapper.classList.add("active"); //show autocomplete box
         showSuggestions(emptyArray);
@@ -23,14 +23,15 @@ inputBox.onkeyup = (e) => {
 }
 
 function select(element) {
-    inputBox.value = element.textContent;
+    emailAddInput.value = element.textContent;
+    nameAddInput.value = nameSuggestions[emailSuggestions.indexOf(element.textContent)];
     searchWrapper.classList.remove("active");
 }
 
 function showSuggestions(list) {
     let listData;
     if (!list.length) {
-        listData = `<li>${inputBox.value}</li>`;
+        listData = `<li>${emailAddInput.value}</li>`;
     } else {
         listData = list.join('');
     }

@@ -11,7 +11,7 @@
           crossorigin="anonymous"></script>
   <link href="../../css/selection-color.css" rel="stylesheet">
   <script defer src="../../js/form-validation.js"></script>
-  <script defer src="../../js/max-file-size-upload.js"></script>
+  <script defer src="../../js/file-upload-validation.js"></script>
   <title>Add Book</title>
 </head>
 <body>

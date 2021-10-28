@@ -11,6 +11,8 @@ public class RecordEntity extends Entity {
 
     Date borrowDate;
     Date dueDate;
+    Date returnDate;
     int bookId;
     ReaderEntity reader;
+    Status status;
 }

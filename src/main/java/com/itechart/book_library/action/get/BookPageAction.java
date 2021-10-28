@@ -21,10 +21,13 @@ public class BookPageAction implements Action {
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
         BookDto bookDto = bookService.getById(Integer.parseInt(req.getParameter("id")));
-        List<RecordDto> records = readerService.getRecords(Integer.parseInt(req.getParameter("id")));
+        List<RecordDto> activeRecords = readerService.getRecords(Integer.parseInt(req.getParameter("id")), true);
+        List<RecordDto> inactiveRecords = readerService.getRecords(Integer.parseInt(req.getParameter("id")), false);
 
-        req.setAttribute("records", records);
-        req.setAttribute("suggestions", readerService.getAllReaders().stream().map(ReaderDto::getEmail).toArray());
+        req.setAttribute("activeRecords", activeRecords);
+        req.setAttribute("inactiveRecords", inactiveRecords);
+        req.setAttribute("emailSuggestions", readerService.getAllReaders().stream().map(ReaderDto::getEmail).toArray());
+        req.setAttribute("nameSuggestions", readerService.getAllReaders().stream().map(ReaderDto::getName).toArray());
         req.setAttribute("bookDto", bookDto);
         return new ActionResult(ActionConstants.BOOK_EDIT_PAGE);
     }

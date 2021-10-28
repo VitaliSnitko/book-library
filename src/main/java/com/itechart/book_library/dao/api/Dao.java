@@ -16,4 +16,6 @@ public interface Dao<T extends Entity> {
 
     void delete(Integer[] ids);
 
+    void delete(Integer[] ids, Connection connection) throws SQLException;
+
 }
