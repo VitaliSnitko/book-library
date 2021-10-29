@@ -2,17 +2,20 @@ let searchWrapper = document.getElementsByClassName('search-input')[0];
 let emailAddInput = document.getElementById('recordEmail');
 let nameAddInput = document.getElementById('recordName');
 let suggBox = document.getElementsByClassName("autocom-box")[0];
+
 emailAddInput.onkeyup = (e) => {
     let actualInput = e.target.value;
-    let emptyArray = [];
+    let suggestionContainer = [];
     if (actualInput) {
-        emptyArray = emailSuggestions.filter((data) => {
-            return data.toLocaleLowerCase().startsWith(actualInput.toLocaleLowerCase());
-        }).map((data) => {
-            return `<li>${data}</li>`;
+        suggestionContainer = emailSuggestions.filter((emailSuggestion) => {
+            return emailSuggestion.toLocaleLowerCase().startsWith(actualInput.toLocaleLowerCase());
+        }).map((emailSuggestion) => {
+            return `<li>${emailSuggestion}</li>`;
         });
         searchWrapper.classList.add("active"); //show autocomplete box
-        showSuggestions(emptyArray);
+        if (suggestionContainer.length !== 0) {
+            showSuggestions(suggestionContainer);
+        }
         let allList = suggBox.querySelectorAll("li");
         for (let i = 0; i < allList.length; i++) {
             allList[i].setAttribute("onclick", "select(this)");
