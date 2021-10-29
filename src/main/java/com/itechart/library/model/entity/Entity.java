@@ -1,23 +1,19 @@
 package com.itechart.library.model.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
 @SuperBuilder
 @AllArgsConstructor
+@Getter
+@Setter
 public abstract class Entity {
 
     private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @Override
     public boolean equals(Object o) {

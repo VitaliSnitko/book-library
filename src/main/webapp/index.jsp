@@ -4,7 +4,6 @@
 <html>
 <head>
     <title>Book Library</title>
-    <link rel="stylesheet" href="css/main-page.css">
 </head>
 <body>
 <c:redirect url="/main"/>
