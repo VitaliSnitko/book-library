@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
   <meta charset="utf-8">
@@ -15,8 +15,6 @@
   <title>Book Library</title>
 </head>
 <body>
-
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -25,9 +23,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <div class="navbar-nav">
-        <a class="nav-link active" aria-current="page" href="/main">Home</a>
-        <a class="nav-link" href="/add">Add book</a>
-        <a class="nav-link" href="/search" tabindex="-1">Search</a>
+        <a class="nav-link active" aria-current="page" href="<c:url value="/main"/>">Home</a>
+        <a class="nav-link" href="<c:url value="/add"/>">Add book</a>
+        <a class="nav-link" href="<c:url value="/search"/>" tabindex="-1">Search</a>
       </div>
     </div>
   </div>
@@ -38,7 +36,7 @@
       <div class="col-12 col-sm-8 col-lg-5">
         <div class="list-group">
           <c:forEach var="bookDto" items="${requestScope.bookList}">
-            <a href="/edit?id=${bookDto.id}" class="list-group-item list-group-item-action d-flex">
+            <a href="<c:url value="/edit?id=${bookDto.id}"/>" class="list-group-item list-group-item-action d-flex">
               <div class="image-parent">
                 <c:choose>
                   <c:when test="${bookDto.base64Cover.equals(\"\")}">
@@ -73,7 +71,9 @@
                 <small class="publish-date text-muted"><b>Publish date:</b> ${bookDto.publishDate}
                 </small>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="delete" value="${bookDto.id}">
+                  <label>
+                    <input class="form-check-input" type="checkbox" name="delete" value="${bookDto.id}">
+                  </label>
                 </div>
               </div>
             </a>
@@ -95,24 +95,20 @@
     <ul class="pagination">
       <c:if test="${param.page != null && param.page != 1}">
         <li class="page-item">
-          <a class="page-link" href="/main?page=${param.page - 1}" aria-label="Previous">
+          <a class="page-link prevPageButt" href="" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
       </c:if>
 
       <c:forEach var="pageNum" begin="1" end="${pageAmount}">
-        <li class="page-item"><a class="page-link" href="/main?page=${pageNum}">${pageNum}</a></li>
+        <li class="page-item"><a class="page-link pageButt" href="">${pageNum}</a></li>
       </c:forEach>
 
       <c:if test="${param.page != pageAmount && requestScope.bookList.size() != 0}">
-        <c:set var="currentPage" value="${param.page}"/>
-        <c:if test="${currentPage == null}">
-          <c:set var="currentPage" value="1"/>
-        </c:if>
         <li class="page-item">
 
-          <a class="page-link" href="/main?page=${currentPage + 1}" aria-label="Next">
+          <a class="page-link nextPageButt" href="" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>

@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+@SuppressWarnings("UnusedAssignment")
 @Log4j
 public class BookDaoImpl extends BaseDao implements BookDao {
 
@@ -22,11 +23,12 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id""";
     private static final String SELECT_LIMIT_OFFSET_WITH_PARAMETERS_QUERY = """
-            with parameters(title_p, authors_p, genres_p, description_p) as (
-                values (?, ?, ?, ?)
+            with parameters(title_p, authors_p, genres_p, description_p, only_available_p) as (
+                values (?, ?, ?, ?, ?)
             )
             select distinct book.*, author.*, genre.*
-            from parameters, book
+            from parameters,
+                 book
                      left join author_book on author_book.book_id = book.id
                      left join author on author_book.author_id = author.id
                      left join genre_book on genre_book.book_id = book.id
@@ -35,8 +37,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
               and author.name ~* authors_p
               and genre.name ~* genres_p
               and description ~* description_p
+              and case when only_available_p then available != 0 else true end
               and book.id in (select distinct book.id
-                              from parameters, book
+                              from parameters,
+                                   book
                                        left join author_book on author_book.book_id = book.id
                                        left join author on author_book.author_id = author.id
                                        left join genre_book on genre_book.book_id = book.id
@@ -45,8 +49,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
                                 and author.name ~* authors_p
                                 and genre.name ~* genres_p
                                 and description ~* description_p
+                                and case when only_available_p then available != 0 else true end
                               order by book.id desc
-                              limit ? offset ?);""";
+                              limit ? offset ?)
+            order by book.id desc;""";
     private static final String SELECT_BY_ID_QUERY = """
             select book.*, author.*, genre.*
             from book
@@ -113,6 +119,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setString(i++, specification.getAuthors());
             statement.setString(i++, specification.getGenres());
             statement.setString(i++, specification.getDescription());
+            statement.setBoolean(i++, specification.isOnlyAvailable());
             statement.setInt(i++, limit);
             statement.setInt(i++, offset);
             return getBookListFromResultSet(statement.executeQuery());

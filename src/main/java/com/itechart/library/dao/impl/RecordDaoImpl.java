@@ -8,10 +8,7 @@ import com.itechart.library.model.entity.RecordEntity;
 import com.itechart.library.model.entity.Status;
 import lombok.extern.log4j.Log4j;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +30,7 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
             SELECT reader.*, record.status FROM reader
             JOIN record ON reader.id = record.reader_id
             WHERE email = ? AND record.book_id = ?;""";
+    private static final String SELECT_NEAREST_AVAILABLE_DATE_QUERY = "select min(record.due_date) from record where book_id = ?";
 
     @Override
     public RecordEntity create(RecordEntity recordEntity, Connection connection) throws SQLException {
@@ -105,6 +103,23 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
             log.error("Cannot get by email ", e);
         }
         return recordEntity;
+    }
+
+    @Override
+    public Date getNearestAvailableDateByBookId(int bookId) {
+        Connection connection = connectionPool.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(SELECT_NEAREST_AVAILABLE_DATE_QUERY)) {
+            statement.setInt(1, bookId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getDate(1);
+            }
+        } catch (SQLException e) {
+            log.error("Cannot get books ", e);
+        } finally {
+            connectionPool.returnToPool(connection);
+        }
+        return null;
     }
 
     private List<RecordEntity> getRecordListFromResultSet(ResultSet resultSet) throws SQLException {

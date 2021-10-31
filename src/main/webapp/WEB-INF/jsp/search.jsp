@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
   <meta charset="utf-8">
@@ -19,9 +19,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <div class="navbar-nav">
-        <a class="nav-link" aria-current="page" href="/main">Home</a>
-        <a class="nav-link" href="/add">Add book</a>
-        <a class="nav-link active" href="/search" tabindex="-1">Search</a>
+        <a class="nav-link" aria-current="page" href="<c:url value="/main"/>">Home</a>
+        <a class="nav-link" href="<c:url value="/add"/>">Add book</a>
+        <a class="nav-link active" href="<c:url value="/search"/>" tabindex="-1">Search</a>
       </div>
     </div>
   </div>
@@ -53,10 +53,18 @@
             <input type="text" name="genres" class="form-control" id="genres">
           </div>
         </div>
-        <div class="row mb-2 justify-content-center">
+        <div class="row mb-3 justify-content-center">
           <label for="description" class="form-label col-sm-1 col-form-label">Description</label>
           <div class="col-sm-4">
             <input type="text" name="description" class="form-control" id="description">
+          </div>
+        </div>
+        <div class="row mb-2 justify-content-center">
+          <div class="form-check col-sm-5" style="position:relative; left: 12px">
+            <input class="form-check-input" type="checkbox" value="true" name="onlyAvailable" id="availableBooksCheckbox">
+            <label class="form-check-label" for="availableBooksCheckbox">
+              Show only available books
+            </label>
           </div>
         </div>
         <div class="row mt-4 justify-content-center">

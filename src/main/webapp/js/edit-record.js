@@ -28,6 +28,9 @@ editRecordButton.onclick = function () {
 
     let status = document.getElementById('editStatus');
     let arrStatus = status.value.split(' ');
+    if (arrStatus[0] === 'Unavailable') {
+        arrStatus = ['Available', 0, 'out', 'of', document.getElementById('editTotalAmount').value];
+    }
 
     if (statusModalInput.value === 'returned' && recordStatus.value === 'borrowed') {
         arrStatus[1] = Number(arrStatus[1]) + 1;

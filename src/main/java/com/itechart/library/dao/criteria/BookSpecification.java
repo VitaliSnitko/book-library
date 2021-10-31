@@ -11,6 +11,7 @@ public class BookSpecification {
     private String authors;
     private String genres;
     private String description;
+    private boolean onlyAvailable;
 
     public BookSpecification convertSpecificationParametersToRegex() {
         String defaultValue = ".*%s.*";

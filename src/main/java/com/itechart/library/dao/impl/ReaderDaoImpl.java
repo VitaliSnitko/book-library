@@ -68,7 +68,6 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
 
     @Override
     public void delete(Integer[] ids) {
-
     }
 
     @Override

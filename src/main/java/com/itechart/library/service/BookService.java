@@ -76,7 +76,7 @@ public enum BookService {
 
     public BookDto getById(int id) {
         Optional<BookEntity> optionalBook = bookDao.getById(id);
-        if (optionalBook.isEmpty()) return null;
+        if (optionalBook.isEmpty()) return new BookDto();
         return bookConverter.toDto(optionalBook.get());
     }
 

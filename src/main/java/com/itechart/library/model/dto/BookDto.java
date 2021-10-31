@@ -3,6 +3,7 @@ package com.itechart.library.model.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.List;
 @Builder
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class BookDto {
 
     private int id;

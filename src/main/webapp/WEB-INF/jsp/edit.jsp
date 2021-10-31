@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page import="java.time.temporal.ChronoUnit" %>
 <html>
@@ -31,9 +31,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <div class="navbar-nav">
-        <a class="nav-link" aria-current="page" href="/main">Home</a>
-        <a class="nav-link active" href="/add">Add book</a>
-        <a class="nav-link" href="/search" tabindex="-1">Search</a>
+        <a class="nav-link" aria-current="page" href="<c:url value="/main"/>">Home</a>
+        <a class="nav-link active" href="<c:url value="/add"/>">Add book</a>
+        <a class="nav-link" href="<c:url value="/search"/>" tabindex="-1">Search</a>
       </div>
     </div>
   </div>
@@ -183,9 +183,9 @@
       </div>
     </div>
     <div class="row mb-1 justify-content-center">
-      <label for="validationCustom08" class="form-label col-sm-2 col-form-label">Total book amount</label>
+      <label for="editTotalAmount" class="form-label col-sm-2 col-form-label">Total book amount</label>
       <div class="col-sm-4">
-        <input type="text" name="totalBookAmount" class="form-control" id="validationCustom08"
+        <input type="text" name="totalBookAmount" class="form-control" id="editTotalAmount"
                value="${bookDto.totalBookAmount}" required pattern="\d+">
       </div>
     </div>
@@ -204,15 +204,24 @@
     <div class="row mb-2 justify-content-center">
       <label for="editStatus" class="form-label col-sm-2 col-form-label">Status</label>
       <div class="col-sm-4">
-        <input class="form-control-plaintext" type="text" readonly
-               value="Available ${bookDto.availableBookAmount} out of ${bookDto.totalBookAmount}"
-               id="editStatus">
+        <c:choose>
+          <c:when test="${bookDto.availableBookAmount == 0}">
+            <input class="form-control-plaintext" type="text" readonly
+                   value="Unavailable (expected to become available on ${requestScope.nearestAvailableDate})"
+                   id="editStatus">
+          </c:when>
+          <c:otherwise>
+            <input class="form-control-plaintext" type="text" readonly
+                   value="Available ${bookDto.availableBookAmount} out of ${bookDto.totalBookAmount}"
+                   id="editStatus">
+          </c:otherwise>
+        </c:choose>
       </div>
     </div>
     <div class="row mb-2 justify-content-center">
       <div class="col-sm-6">
         <button class="btn btn-primary me-3" type="submit">Save</button>
-        <a class="btn btn-secondary" href="/main" role="button">Discard</a>
+        <a class="btn btn-secondary" href="<c:url value="/main"/>" role="button">Discard</a>
       </div>
     </div>
 

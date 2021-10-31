@@ -52,10 +52,6 @@ public enum ReaderService {
     private static final String DUE_DATE_REMINDER_STRING = "DueDateReminder";
     private static final String OVERDUE_REMINDER_STRING = "OverdueReminder";
 
-    private int availableBookAmount;
-    private int totalBookAmount;
-    private int bookId;
-
     public void createReaderRecords(String[] emails, String[] names, String[] periods, BookDto bookDto) {
         List<ReaderEntity> readerEntities = getReaderEntities(emails, names);
         List<RecordEntity> recordEntities = getRecordEntities(readerEntities, periods, bookDto);
@@ -69,10 +65,17 @@ public enum ReaderService {
         Connection connection = connectionPool.getConnection();
         setAutoCommit(connection, false);
         try {
-            this.bookId = recordDtos.get(0).getBook().getId();
-            this.availableBookAmount = bookDao.getAvailableBookAmount(bookId);
-            this.totalBookAmount = bookDao.getTotalBookAmount(bookId);
+            int bookId = recordDtos.get(0).getBook().getId();
+            int availableBookAmount = bookDao.getAvailableBookAmount(bookId);
+            int totalBookAmount = bookDao.getTotalBookAmount(bookId);
             for (RecordDto recordDto : recordDtos) {
+                if (recordDto.getStatus() == Status.RETURNED) {
+                    availableBookAmount++;
+                } else {
+                    totalBookAmount--;
+                }
+                bookDao.updateAvailableAmount(availableBookAmount, bookId, connection);
+                bookDao.updateTotalAmount(totalBookAmount, bookId, connection);
                 updateRecord(connection, recordDto);
                 unscheduleJobs(recordDto);
             }
@@ -86,11 +89,6 @@ public enum ReaderService {
     }
 
     private void updateRecord(Connection connection, RecordDto recordDto) throws SQLException {
-        if (recordDto.getStatus() == Status.RETURNED) {
-            bookDao.updateAvailableAmount(++availableBookAmount, bookId, connection);
-        } else {
-            bookDao.updateTotalAmount(--totalBookAmount, bookId, connection);
-        }
         recordDao.update(recordConverter.toEntity(recordDto), connection);
     }
 
@@ -119,43 +117,45 @@ public enum ReaderService {
     private void createReaderRecords(List<ReaderEntity> readerEntities, List<RecordEntity> recordEntities) {
         Connection connection = connectionPool.getConnection();
         setAutoCommit(connection, false);
-        this.bookId = recordEntities.get(0).getBook().getId();
-        this.availableBookAmount = bookDao.getAvailableBookAmount(bookId);
-        for (int i = 0; i < readerEntities.size(); i++) {
-            try {
-                createReaderRecord(readerEntities.get(i), recordEntities.get(i), connection);
-                scheduleJobs(recordEntities.get(i));
-                commit(connection);
-            } catch (SQLException e) {
-                rollback(connection);
-                log.error(e);
+        int bookId = recordEntities.get(0).getBook().getId();
+        int availableBookAmount = bookDao.getAvailableBookAmount(bookId);
+        try {
+            for (int i = 0; i < readerEntities.size(); i++) {
+                ReaderEntity readerEntity = readerEntities.get(i);
+                RecordEntity recordEntity = recordEntities.get(i);
+                Optional<ReaderEntity> readerByEmailOptional = readerDao.getByEmail(readerEntity.getEmail(), connection);
+                ReaderEntity newReaderEntity;
+                if (readerByEmailOptional.isEmpty()) {
+                    newReaderEntity = readerDao.create(readerEntity, connection);
+                } else {
+                    readerDao.update(readerEntity, connection);
+                    newReaderEntity = readerByEmailOptional.get();
+                }
+                recordEntity.getReader().setId(newReaderEntity.getId());
+
+                Optional<RecordEntity> recordOptional = recordDao.getByEmailInCurrentBook(newReaderEntity.getEmail(), recordEntity.getBook().getId(), connection);
+                if (recordOptional.isEmpty() || recordOptional.get().getStatus() != Status.BORROWED) {
+                    recordDao.create(recordEntity, connection);
+                    try {
+                        bookDao.updateAvailableAmount(--availableBookAmount, bookId, connection);
+                        //scheduleJobs(recordEntities.get(i));
+                    } catch (SQLException e) {
+                        log.warn("No books available");
+                        rollback(connection);
+                    }
+                }
             }
+            commit(connection);
+        } catch (SQLException e) {
+            rollback(connection);
+            log.error(e);
         }
         setAutoCommit(connection, true);
         connectionPool.returnToPool(connection);
     }
 
-    private void createReaderRecord(ReaderEntity readerEntity, RecordEntity recordEntity, Connection connection) throws SQLException {
-        Optional<ReaderEntity> readerByEmailOptional = readerDao.getByEmail(readerEntity.getEmail(), connection);
-        ReaderEntity newReaderEntity;
-        if (readerByEmailOptional.isEmpty()) {
-            newReaderEntity = readerDao.create(readerEntity, connection);
-        } else {
-            readerDao.update(readerEntity, connection);
-            newReaderEntity = readerByEmailOptional.get();
-        }
-        recordEntity.getReader().setId(newReaderEntity.getId());
-
-        Optional<RecordEntity> recordOptional = recordDao.getByEmailInCurrentBook(newReaderEntity.getEmail(), recordEntity.getBook().getId(), connection);
-        if (recordOptional.isEmpty() || recordOptional.get().getStatus() != Status.BORROWED) {
-            recordDao.create(recordEntity, connection);
-            try {
-                bookDao.updateAvailableAmount(--availableBookAmount, this.bookId, connection);
-            } catch (SQLException e) {
-                log.warn("No books available");
-                rollback(connection);
-            }
-        }
+    public Date getNearestAvailableDate(BookDto bookDto) {
+        return recordDao.getNearestAvailableDateByBookId(bookDto.getId());
     }
 
     public List<RecordDto> getRecordsByBookId(int bookId) {
@@ -176,7 +176,7 @@ public enum ReaderService {
         scheduleManager.unscheduleJob(recordDto, OVERDUE_REMINDER_STRING);
     }
 
-    private void createDueDateReminder(RecordEntity recordEntity){
+    private void createDueDateReminder(RecordEntity recordEntity) {
         Date triggerDate;
         //triggerDate = Date.valueOf(recordEntity.getDueDate().toLocalDate().minusWeeks(1).minusDays(1));
         Calendar calendar = Calendar.getInstance();

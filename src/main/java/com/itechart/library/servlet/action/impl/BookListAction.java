@@ -48,6 +48,7 @@ public class BookListAction implements Action {
                 .authors(req.getParameter("authors"))
                 .genres(req.getParameter("genres"))
                 .description(req.getParameter("description"))
+                .onlyAvailable(req.getParameter("onlyAvailable") != null)
                 .build()
                 .convertSpecificationParametersToRegex();
     }

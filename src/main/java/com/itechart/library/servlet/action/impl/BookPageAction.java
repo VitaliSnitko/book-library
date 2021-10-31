@@ -29,6 +29,7 @@ public class BookPageAction implements Action {
         req.setAttribute("inactiveRecords", getInactiveRecords(records));
         req.setAttribute("emailSuggestions", readerService.getAllReaders().stream().map(ReaderDto::getEmail).toArray());
         req.setAttribute("nameSuggestions", readerService.getAllReaders().stream().map(ReaderDto::getName).toArray());
+        req.setAttribute("nearestAvailableDate", readerService.getNearestAvailableDate(bookDto));
         req.setAttribute("bookDto", bookDto);
         return new ActionResult(ActionConstants.BOOK_EDIT_PAGE);
     }

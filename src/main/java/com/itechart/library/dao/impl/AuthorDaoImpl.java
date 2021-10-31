@@ -19,8 +19,6 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
     private static final String INSERT_QUERY = "INSERT INTO author (id, name) VALUES (DEFAULT, ?) RETURNING id";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM author WHERE id = ?";
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM author WHERE name = ?";
-    private static final StringBuilder TEMPLATE_DELETE_QUERY = new StringBuilder("DELETE FROM author WHERE name IN(?");
-    private static StringBuilder DELETE_QUERY = TEMPLATE_DELETE_QUERY;
 
     @Override
     public AuthorEntity create(AuthorEntity author, Connection connection) throws SQLException {

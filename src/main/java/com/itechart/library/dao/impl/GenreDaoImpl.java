@@ -20,8 +20,6 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private static final String INSERT_QUERY = "INSERT INTO genre (id, name) VALUES (DEFAULT, ?) RETURNING id";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM genre WHERE id = ?";
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM genre WHERE name = ?";
-    private static final StringBuilder TEMPLATE_DELETE_QUERY = new StringBuilder("DELETE FROM genre WHERE id IN(?");
-    private static StringBuilder DELETE_QUERY = TEMPLATE_DELETE_QUERY;
 
     @Override
     public GenreEntity create(GenreEntity genre, Connection connection) throws SQLException {
@@ -45,7 +43,6 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
 
     @Override
     public void delete(Integer[] ids) {
-
     }
 
     @Override
