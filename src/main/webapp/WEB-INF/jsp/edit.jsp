@@ -234,7 +234,7 @@
         </c:choose>
       </div>
     </div>
-    <!-- Active Record -->
+    <!-- Active Records -->
     <div class="row justify-content-center mt-2">
       <div class="col-sm-6">
         <h6 class="text-muted">Active Records</h6>

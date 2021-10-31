@@ -23,7 +23,7 @@ public class BookPageAction implements Action {
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
         BookDto bookDto = bookService.getById(Integer.parseInt(req.getParameter("id")));
-        List<RecordDto> records = readerService.getRecords(Integer.parseInt(req.getParameter("id")));
+        List<RecordDto> records = readerService.getRecordsByBookId(Integer.parseInt(req.getParameter("id")));
 
         req.setAttribute("activeRecords", getActiveRecords(records));
         req.setAttribute("inactiveRecords", getInactiveRecords(records));

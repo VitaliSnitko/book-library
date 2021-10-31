@@ -44,7 +44,7 @@ public class BookEditAction implements Action {
 
         if (recordsWereAdded(req)) {
             if (readerValidator.isValid(req)) {
-                saveRecords(req, bookDto);
+                createReaderRecords(req, bookDto);
             } else {
                 log.warn("Non valid reader parameters caught");
                 return new ActionResult(ActionConstants.BOOK_EDIT_PAGE, ActionConstants.redirect);
@@ -60,8 +60,8 @@ public class BookEditAction implements Action {
         }
     }
 
-    private void saveRecords(HttpServletRequest req, BookDto bookDto) {
-        readerService.saveRecords(
+    private void createReaderRecords(HttpServletRequest req, BookDto bookDto) {
+        readerService.createReaderRecords(
                 req.getParameterValues("email"),
                 req.getParameterValues("name"),
                 req.getParameterValues("period"),

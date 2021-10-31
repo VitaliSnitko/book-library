@@ -20,6 +20,9 @@ import com.itechart.library.model.dto.RecordDto;
 import com.itechart.library.model.entity.ReaderEntity;
 import com.itechart.library.model.entity.RecordEntity;
 import com.itechart.library.model.entity.Status;
+import com.itechart.library.scheduler.ScheduleManager;
+import com.itechart.library.scheduler.job.DueDateReminderJob;
+import com.itechart.library.scheduler.job.OverdueReminderJob;
 import lombok.extern.log4j.Log4j;
 
 import java.sql.Connection;
@@ -27,6 +30,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +39,8 @@ public enum ReaderService {
     INSTANCE;
 
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
+    private final ScheduleManager scheduleManager = ScheduleManager.getInstance();
+
     private final ReaderDao readerDao = BaseDao.getDao(ReaderDaoImpl.class);
     private final RecordDao recordDao = BaseDao.getDao(RecordDaoImpl.class);
     private final BookDao bookDao = BaseDao.getDao(BookDaoImpl.class);
@@ -43,14 +49,17 @@ public enum ReaderService {
     private final ReaderConverter readerConverter = new ReaderConverterImpl();
     private final RecordConverter recordConverter = new RecordConverterImpl();
 
+    private static final String DUE_DATE_REMINDER_STRING = "DueDateReminder";
+    private static final String OVERDUE_REMINDER_STRING = "OverdueReminder";
+
     private int availableBookAmount;
     private int totalBookAmount;
     private int bookId;
 
-    public void saveRecords(String[] emails, String[] names, String[] periods, BookDto bookDto) {
+    public void createReaderRecords(String[] emails, String[] names, String[] periods, BookDto bookDto) {
         List<ReaderEntity> readerEntities = getReaderEntities(emails, names);
         List<RecordEntity> recordEntities = getRecordEntities(readerEntities, periods, bookDto);
-        saveReaderRecords(readerEntities, recordEntities);
+        createReaderRecords(readerEntities, recordEntities);
     }
 
     public void updateRecords(List<RecordDto> recordDtos) {
@@ -65,6 +74,7 @@ public enum ReaderService {
             this.totalBookAmount = bookDao.getTotalBookAmount(bookId);
             for (RecordDto recordDto : recordDtos) {
                 updateRecord(connection, recordDto);
+                unscheduleJobs(recordDto);
             }
             commit(connection);
         } catch (SQLException e) {
@@ -82,14 +92,6 @@ public enum ReaderService {
             bookDao.updateTotalAmount(--totalBookAmount, bookId, connection);
         }
         recordDao.update(recordConverter.toEntity(recordDto), connection);
-    }
-
-    public List<RecordDto> getRecords(int bookId) {
-        return recordConverter.toDtos(recordDao.getRecordsByBookId(bookId));
-    }
-
-    public List<ReaderDto> getAllReaders() {
-        return readerConverter.toDtos(readerDao.getAll());
     }
 
     private List<ReaderEntity> getReaderEntities(String[] emails, String[] names) {
@@ -114,14 +116,15 @@ public enum ReaderService {
         return recordEntities;
     }
 
-    private void saveReaderRecords(List<ReaderEntity> readerEntities, List<RecordEntity> recordEntities) {
+    private void createReaderRecords(List<ReaderEntity> readerEntities, List<RecordEntity> recordEntities) {
         Connection connection = connectionPool.getConnection();
         setAutoCommit(connection, false);
         this.bookId = recordEntities.get(0).getBook().getId();
         this.availableBookAmount = bookDao.getAvailableBookAmount(bookId);
         for (int i = 0; i < readerEntities.size(); i++) {
             try {
-                saveReaderRecord(readerEntities.get(i), recordEntities.get(i), connection);
+                createReaderRecord(readerEntities.get(i), recordEntities.get(i), connection);
+                scheduleJobs(recordEntities.get(i));
                 commit(connection);
             } catch (SQLException e) {
                 rollback(connection);
@@ -132,7 +135,7 @@ public enum ReaderService {
         connectionPool.returnToPool(connection);
     }
 
-    private void saveReaderRecord(ReaderEntity readerEntity, RecordEntity recordEntity, Connection connection) throws SQLException {
+    private void createReaderRecord(ReaderEntity readerEntity, RecordEntity recordEntity, Connection connection) throws SQLException {
         Optional<ReaderEntity> readerByEmailOptional = readerDao.getByEmail(readerEntity.getEmail(), connection);
         ReaderEntity newReaderEntity;
         if (readerByEmailOptional.isEmpty()) {
@@ -153,6 +156,38 @@ public enum ReaderService {
                 rollback(connection);
             }
         }
+    }
+
+    public List<RecordDto> getRecordsByBookId(int bookId) {
+        return recordConverter.toDtos(recordDao.getRecordsByBookId(bookId));
+    }
+
+    public List<ReaderDto> getAllReaders() {
+        return readerConverter.toDtos(readerDao.getAll());
+    }
+
+    private void scheduleJobs(RecordEntity recordEntity) {
+        createDueDateReminder(recordEntity);
+        createOverdueReminder(recordEntity);
+    }
+
+    private void unscheduleJobs(RecordDto recordDto) {
+        scheduleManager.unscheduleJob(recordDto, DUE_DATE_REMINDER_STRING);
+        scheduleManager.unscheduleJob(recordDto, OVERDUE_REMINDER_STRING);
+    }
+
+    private void createDueDateReminder(RecordEntity recordEntity){
+        Date triggerDate;
+        //triggerDate = Date.valueOf(recordEntity.getDueDate().toLocalDate().minusWeeks(1).minusDays(1));
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, 6);
+        triggerDate = new Date(calendar.getTime().getTime());
+        scheduleManager.scheduleJob(recordEntity, DUE_DATE_REMINDER_STRING, triggerDate, DueDateReminderJob.class);
+    }
+
+    private void createOverdueReminder(RecordEntity recordEntity) {
+        Date triggerDate = Date.valueOf(recordEntity.getDueDate().toLocalDate().plusDays(1));
+        scheduleManager.scheduleJob(recordEntity, OVERDUE_REMINDER_STRING, triggerDate, OverdueReminderJob.class);
     }
 
     private void setAutoCommit(Connection connection, boolean autoCommit) {

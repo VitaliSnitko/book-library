@@ -6,7 +6,7 @@ import java.util.Arrays;
 public enum ReaderValidator implements Validator {
     INSTANCE;
 
-    private static final String emailPattern = "[a-zA-Z]+@[a-zA-Z]+\\.*[a-zA-Z]*";
+    private static final String emailPattern = ".*";
     private static final String namePattern = ".+";
 
     @Override
