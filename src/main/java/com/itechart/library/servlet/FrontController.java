@@ -12,11 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * {@code FrontController} is central controller designed to map HTTP requests
+ * and actions through {@link ActionFactory}.
+ */
 @WebServlet({"/main", "/add", "/edit", "/delete", "/search"})
-@MultipartConfig(maxFileSize = 2097152)
+@MultipartConfig(maxFileSize = 2_097_152)
 public class FrontController extends HttpServlet {
 
-    ActionFactory actionFactory;
+    private ActionFactory actionFactory;
 
     @Override
     public void init() {

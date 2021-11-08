@@ -2,20 +2,25 @@ package com.itechart.library.servlet.action.impl;
 
 import com.itechart.library.dao.criteria.BookSpecification;
 import com.itechart.library.service.BookService;
+import com.itechart.library.service.impl.BookServiceProxy;
 import com.itechart.library.servlet.action.Action;
 import com.itechart.library.servlet.action.ActionConstants;
 import com.itechart.library.servlet.action.ActionResult;
+import lombok.extern.log4j.Log4j;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
+@Log4j
 public class BookListAction implements Action {
 
-    private final BookService bookService = BookService.INSTANCE;
+    public static final int DEFAULT_PAGE_IF_REQ_PARAM_INVALID = 0;
+    private final BookService bookService = new BookServiceProxy();
     private int pageBookAmount;
-    private static final int DEFAULT_PAGE_NUM = 1;
+    private static final int DEFAULT_PAGE = 1;
 
     public BookListAction() {
         try {
@@ -23,7 +28,7 @@ public class BookListAction implements Action {
             applicationProperties.load(getClass().getClassLoader().getResourceAsStream("application.properties"));
             this.pageBookAmount = Integer.parseInt(applicationProperties.getProperty("book-amount-on-one-page"));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 
@@ -31,15 +36,24 @@ public class BookListAction implements Action {
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
         int page = getPage(req);
         BookSpecification specification = getSpecification(req);
-        int totalBookAmount = bookService.getBookCountBySpecification(specification);
+        int totalBookAmount = bookService.getBookCount(specification);
 
-        req.setAttribute("bookList", bookService.getLimitOffsetBySpecification(specification, this.pageBookAmount, page));
+        req.setAttribute("bookList", page == DEFAULT_PAGE_IF_REQ_PARAM_INVALID
+                ? new ArrayList<>()
+                : bookService.getLimitOffsetBySpecification(specification, this.pageBookAmount, page));
         req.setAttribute("pageAmount", Math.ceil((float) totalBookAmount / this.pageBookAmount));
         return new ActionResult(ActionConstants.BOOK_LIST_PAGE);
     }
 
     private int getPage(HttpServletRequest req) {
-        return (req.getParameter("page") == null) ? DEFAULT_PAGE_NUM : Integer.parseInt(req.getParameter("page"));
+        if (req.getParameter("page") == null) {
+            return DEFAULT_PAGE;
+        }
+        try {
+            return Integer.parseInt(req.getParameter("page"));
+        } catch (NumberFormatException e) {
+            return DEFAULT_PAGE_IF_REQ_PARAM_INVALID;
+        }
     }
 
     private BookSpecification getSpecification(HttpServletRequest req) {

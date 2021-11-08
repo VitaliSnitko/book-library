@@ -1,13 +1,18 @@
 package com.itechart.library.model.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
-@Getter
-public class ReaderDto {
+@SuperBuilder
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class ReaderDto extends Dto {
 
-    int id;
     String email;
     String name;
 }

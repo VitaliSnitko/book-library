@@ -1,16 +1,21 @@
 package com.itechart.library.model.dto;
 
 import com.itechart.library.model.entity.Status;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
-@Builder
-@Getter
-public class RecordDto {
+@SuperBuilder
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class RecordDto extends Dto{
 
-    int id;
     LocalDate borrowDate;
     LocalDate dueDate;
     LocalDate returnDate;

@@ -5,24 +5,28 @@ import javax.servlet.http.HttpServletRequest;
 public enum BookFormValidator implements Validator {
     INSTANCE;
 
-    private static final String titlePattern = ".+";
-    private static final String authorsPattern = ".+ *(, *.+)*";
-    private static final String genresPattern = ".+ *(, *.+)*";
-    private static final String publisherPattern = ".+";
-    private static final String publishDatePattern = ".+";
-    private static final String pageCountPattern = "\\d+";
-    private static final String ISBNPattern = ".+";
-    private static final String totalBookAmountPattern = "\\d+";
+    private static final String AUTHORS_PATTERN = ".+ *(, *.+)*";
+    private static final String GENRES_PATTERN = ".+ *(, *.+)*";
+    private static final String PAGE_COUNT_PATTERN = "\\d+";
+    private static final String TOTAL_BOOK_AMOUNT_PATTERN = "\\d+";
 
     @Override
     public boolean isValid(HttpServletRequest req) {
-        return req.getParameter("title").matches(titlePattern)
-                && req.getParameter("authors").matches(authorsPattern)
-                && req.getParameter("genres").matches(genresPattern)
-                && req.getParameter("publisher").matches(publisherPattern)
-                && req.getParameter("date").matches(publishDatePattern)
-                && req.getParameter("pageCount").matches(pageCountPattern)
-                && req.getParameter("ISBN").matches(ISBNPattern)
-                && req.getParameter("totalBookAmount").matches(totalBookAmountPattern);
+        return req.getParameter("title") != null
+                && req.getParameter("authors") != null
+                && req.getParameter("genres") != null
+                && req.getParameter("publisher") != null
+                && req.getParameter("date") != null
+                && req.getParameter("pageCount") != null
+                && req.getParameter("ISBN") != null
+                && req.getParameter("totalBookAmount") != null
+                && !req.getParameter("title").isBlank()
+                && req.getParameter("authors").matches(AUTHORS_PATTERN)
+                && req.getParameter("genres").matches(GENRES_PATTERN)
+                && !req.getParameter("publisher").isBlank()
+                && !req.getParameter("date").isBlank()
+                && req.getParameter("pageCount").matches(PAGE_COUNT_PATTERN)
+                && !req.getParameter("ISBN").isBlank()
+                && req.getParameter("totalBookAmount").matches(TOTAL_BOOK_AMOUNT_PATTERN);
     }
 }

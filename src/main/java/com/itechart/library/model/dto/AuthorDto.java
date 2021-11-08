@@ -1,14 +1,17 @@
 package com.itechart.library.model.dto;
 
-public class AuthorDto {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-    private final String name;
+@SuperBuilder
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class AuthorDto extends Dto {
 
-    public AuthorDto(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    private String name;
 }

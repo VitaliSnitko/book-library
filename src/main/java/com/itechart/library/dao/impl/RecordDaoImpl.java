@@ -13,32 +13,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@SuppressWarnings("UnusedAssignment")
 @Log4j
 public class RecordDaoImpl extends BaseDao implements RecordDao {
 
     private static final String INSERT_QUERY = "INSERT INTO record (id, book_id, reader_id, borrow_date, due_date) VALUES (DEFAULT, ?, ?, ?, ?) RETURNING id";
     private static final String SELECT_RECORDS_BY_BOOK_ID_QUERY = """
-             select record.id, record.book_id, record.reader_id, record.borrow_date, record.due_date,
-                    reader.email, reader.first_name, record.return_date, record.status
-             from record
-                      join reader on record.reader_id = reader.id
-                      join book on record.book_id = book.id
-             where book.id = ?;
-            """;
+            select reader.email, reader.first_name, record.*
+            from record
+                     join reader on record.reader_id = reader.id
+                     join book on record.book_id = book.id
+            where book.id = ?;""";
     private static final String UPDATE_STATUS_QUERY = "update record set status = ?, return_date = current_date where id = ?";
     private static final String SELECT_BY_EMAIL_AND_BOOK_QUERY = """
             SELECT reader.*, record.status FROM reader
             JOIN record ON reader.id = record.reader_id
             WHERE email = ? AND record.book_id = ?;""";
     private static final String SELECT_NEAREST_AVAILABLE_DATE_QUERY = "select min(record.due_date) from record where book_id = ?";
+    public static final String ID_LABEL = "id";
+    public static final String EMAIL_LABEL = "email";
+    public static final String FIRST_NAME_LABEL = "first_name";
+    public static final String BOOK_ID_LABEL = "book_id";
+    public static final String STATUS_LABEL = "status";
+    public static final String READER_ID_LABEL = "reader_id";
+    public static final String BORROW_DATE_LABEL = "borrow_date";
+    public static final String DUE_DATE_LABEL = "due_date";
+    public static final String RETURN_DATE_LABEL = "return_date";
 
     @Override
     public RecordEntity create(RecordEntity recordEntity, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
-            statement.setInt(1, recordEntity.getBook().getId());
-            statement.setInt(2, recordEntity.getReader().getId());
-            statement.setDate(3, recordEntity.getBorrowDate());
-            statement.setDate(4, recordEntity.getDueDate());
+            int i = 1;
+            statement.setInt(i++, recordEntity.getBook().getId());
+            statement.setInt(i++, recordEntity.getReader().getId());
+            statement.setDate(i++, recordEntity.getBorrowDate());
+            statement.setDate(i++, recordEntity.getDueDate());
             statement.execute();
             recordEntity.setId(getIdAfterInserting(statement));
         }
@@ -51,12 +60,14 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
     }
 
     @Override
-    public void update(RecordEntity record, Connection connection) throws SQLException {
+    public RecordEntity update(RecordEntity record, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_STATUS_QUERY)) {
-            statement.setString(1, record.getStatus().name());
-            statement.setInt(2, record.getId());
+            int i = 1;
+            statement.setString(i++, record.getStatus().name());
+            statement.setInt(i++, record.getId());
             statement.executeUpdate();
         }
+        return record;
     }
 
     @Override
@@ -85,17 +96,18 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
     public Optional<RecordEntity> getByEmailInCurrentBook(String email, int bookId, Connection connection) {
         Optional<RecordEntity> recordEntity = Optional.empty();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_EMAIL_AND_BOOK_QUERY)) {
-            statement.setString(1, email);
-            statement.setInt(2, bookId);
+            int i = 1;
+            statement.setString(i++, email);
+            statement.setInt(i++, bookId);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 ReaderEntity reader = ReaderEntity.builder()
-                        .id(resultSet.getInt(1))
-                        .email(resultSet.getString(2))
-                        .name(resultSet.getString(3))
+                        .id(resultSet.getInt(ID_LABEL))
+                        .email(resultSet.getString(EMAIL_LABEL))
+                        .name(resultSet.getString(FIRST_NAME_LABEL))
                         .build();
                 recordEntity = Optional.of(RecordEntity.builder()
-                        .status(Status.valueOf(resultSet.getString(4)))
+                        .status(Status.valueOf(resultSet.getString(STATUS_LABEL)))
                         .reader(reader)
                         .build());
             }
@@ -125,21 +137,21 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
     private List<RecordEntity> getRecordListFromResultSet(ResultSet resultSet) throws SQLException {
         List<RecordEntity> recordList = new ArrayList<>();
         while (resultSet.next()) {
-            int readerId = resultSet.getInt(3);
+            int readerId = resultSet.getInt(READER_ID_LABEL);
             BookEntity book = BookEntity.builder()
-                    .id(resultSet.getInt(2))
+                    .id(resultSet.getInt(BOOK_ID_LABEL))
                     .build();
             ReaderEntity reader = ReaderEntity.builder()
                     .id(readerId)
-                    .email(resultSet.getString(6))
-                    .name(resultSet.getString(7))
+                    .email(resultSet.getString(EMAIL_LABEL))
+                    .name(resultSet.getString(FIRST_NAME_LABEL))
                     .build();
             RecordEntity record = RecordEntity.builder()
-                    .id(resultSet.getInt(1))
-                    .borrowDate(resultSet.getDate(4))
-                    .dueDate(resultSet.getDate(5))
-                    .returnDate(resultSet.getDate(8))
-                    .status(Status.valueOf(resultSet.getString(9)))
+                    .id(resultSet.getInt(ID_LABEL))
+                    .borrowDate(resultSet.getDate(BORROW_DATE_LABEL))
+                    .dueDate(resultSet.getDate(DUE_DATE_LABEL))
+                    .returnDate(resultSet.getDate(RETURN_DATE_LABEL))
+                    .status(Status.valueOf(resultSet.getString(STATUS_LABEL)))
                     .book(book)
                     .reader(reader)
                     .build();

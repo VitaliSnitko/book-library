@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -33,10 +34,10 @@ public class BookConverterImpl implements BookConverter {
         return BookEntity.builder()
                 .id(bookDto.getId())
                 .title(bookDto.getTitle())
-                .authorEntities(authorConverter.toEntities(bookDto.getAuthorDtos()))
-                .genreEntities(genreConverter.toEntities(bookDto.getGenreDtos()))
+                .authorEntities(bookDto.getAuthorDtos() == null ? new ArrayList<>() : authorConverter.toEntities(bookDto.getAuthorDtos()))
+                .genreEntities(bookDto.getGenreDtos() == null ? new ArrayList<>() : genreConverter.toEntities(bookDto.getGenreDtos()))
                 .publisher(bookDto.getPublisher())
-                .publishDate(Date.valueOf(bookDto.getPublishDate()))
+                .publishDate(bookDto.getPublishDate() == null ? null : Date.valueOf(bookDto.getPublishDate()))
                 .pageCount(bookDto.getPageCount())
                 .ISBN(bookDto.getISBN())
                 .description(bookDto.getDescription())
@@ -56,8 +57,8 @@ public class BookConverterImpl implements BookConverter {
         return BookDto.builder()
                 .id(bookEntity.getId())
                 .title(bookEntity.getTitle())
-                .authorDtos(authorEntities == null ? null : authorConverter.toDtos(authorEntities))
-                .genreDtos(genreEntities == null ? null : genreConverter.toDtos(genreEntities))
+                .authorDtos(authorEntities == null ? new ArrayList<>() : authorConverter.toDtos(authorEntities))
+                .genreDtos(genreEntities == null ? new ArrayList<>() : genreConverter.toDtos(genreEntities))
                 .publisher(bookEntity.getPublisher())
                 .publishDate(publishDate == null ? null : publishDate.toLocalDate())
                 .pageCount(bookEntity.getPageCount())

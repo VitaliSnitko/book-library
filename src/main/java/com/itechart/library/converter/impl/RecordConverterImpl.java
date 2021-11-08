@@ -1,7 +1,7 @@
 package com.itechart.library.converter.impl;
 
 import com.itechart.library.converter.BookConverter;
-import com.itechart.library.converter.ReaderConverter;
+import com.itechart.library.converter.DtoRequestReaderConverter;
 import com.itechart.library.converter.RecordConverter;
 import com.itechart.library.model.dto.ReaderDto;
 import com.itechart.library.model.dto.RecordDto;
@@ -17,7 +17,7 @@ import java.util.List;
 public class RecordConverterImpl implements RecordConverter {
 
     private final BookConverter bookConverter = new BookConverterImpl();
-    private final ReaderConverter readerConverter = new ReaderConverterImpl();
+    private final DtoRequestReaderConverter readerConverter = new ReaderConverterImpl();
 
     @Override
     public RecordEntity toEntity(RecordDto recordDto) {

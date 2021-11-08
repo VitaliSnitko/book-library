@@ -3,6 +3,7 @@ package com.itechart.library.dao.impl;
 import com.itechart.library.dao.BaseDao;
 import com.itechart.library.dao.GenreDao;
 import com.itechart.library.model.entity.GenreEntity;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@SuppressWarnings("UnusedAssignment")
 public class GenreDaoImpl extends BaseDao implements GenreDao {
 
     private static final Logger log = Logger.getLogger(GenreDaoImpl.class);
@@ -20,11 +22,14 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private static final String INSERT_QUERY = "INSERT INTO genre (id, name) VALUES (DEFAULT, ?) RETURNING id";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM genre WHERE id = ?";
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM genre WHERE name = ?";
+    public static final String ID_LABEL = "id";
+    public static final String NAME_LABEL = "name";
 
     @Override
     public GenreEntity create(GenreEntity genre, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
-            statement.setString(1, genre.getName());
+            int i = 1;
+            statement.setString(i++, genre.getName());
             statement.execute();
             genre.setId(getIdAfterInserting(statement));
         }
@@ -38,15 +43,18 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     }
 
     @Override
-    public void update(GenreEntity entity, Connection connection) {
+    public GenreEntity update(GenreEntity entity, Connection connection) {
+        throw new NotImplementedException("This method is not implemented for GenreDao");
     }
 
     @Override
     public void delete(Integer[] ids) {
+        throw new NotImplementedException("This method is not implemented for GenreDao");
     }
 
     @Override
     public void delete(Integer[] ids, Connection connection) throws SQLException {
+        throw new NotImplementedException("This method is not implemented for GenreDao");
     }
 
     @Override
@@ -85,8 +93,8 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
         List<GenreEntity> genreEntities = new ArrayList<>();
         while (resultSet.next()) {
             genreEntities.add(GenreEntity.builder()
-                    .id(resultSet.getInt(1))
-                    .name(resultSet.getString(2))
+                    .id(resultSet.getInt(ID_LABEL))
+                    .name(resultSet.getString(NAME_LABEL))
                     .build());
         }
         return genreEntities;

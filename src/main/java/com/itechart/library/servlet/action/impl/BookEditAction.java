@@ -5,8 +5,8 @@ import com.itechart.library.converter.RecordConverter;
 import com.itechart.library.converter.impl.BookConverterImpl;
 import com.itechart.library.converter.impl.RecordConverterImpl;
 import com.itechart.library.model.dto.BookDto;
-import com.itechart.library.service.BookService;
-import com.itechart.library.service.ReaderService;
+import com.itechart.library.service.impl.BookServiceProxy;
+import com.itechart.library.service.impl.ReaderServiceProxy;
 import com.itechart.library.servlet.action.Action;
 import com.itechart.library.servlet.action.ActionConstants;
 import com.itechart.library.servlet.action.ActionResult;
@@ -14,23 +14,21 @@ import com.itechart.library.servlet.validator.BookFormValidator;
 import com.itechart.library.servlet.validator.ReaderValidator;
 import lombok.extern.log4j.Log4j;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Log4j
 public class BookEditAction implements Action {
 
-    private final BookService bookService = BookService.INSTANCE;
-    private final ReaderService readerService = ReaderService.INSTANCE;
+    private final BookServiceProxy bookService = new BookServiceProxy();
+    private final ReaderServiceProxy readerService = new ReaderServiceProxy();
     private final BookConverter bookConverter = new BookConverterImpl();
     private final BookFormValidator bookValidator = BookFormValidator.INSTANCE;
     private final ReaderValidator readerValidator = ReaderValidator.INSTANCE;
     private final RecordConverter recordConverter = new RecordConverterImpl();
 
     @Override
-    public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
 
         if (!bookValidator.isValid(req)) {
             log.warn("Non valid book parameters caught");
@@ -55,7 +53,7 @@ public class BookEditAction implements Action {
     }
 
     private void updateRecords(HttpServletRequest req) {
-        if (req.getParameterValues("recordId") != null) {
+        if (req.getParameterValues("status") != null) {
             readerService.updateRecords(recordConverter.toDtosFromReq(req));
         }
     }

@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+@SuppressWarnings("UnusedAssignment")
 public class GenreBookDaoImpl extends BaseDao {
 
     private static final String INSERT_GENRE_BOOK_QUERY = "INSERT INTO genre_book (genre_id, book_id) VALUES (?,?)";
@@ -22,15 +23,17 @@ public class GenreBookDaoImpl extends BaseDao {
 
     public void setGenreToBook(int authorId, int bookId, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_GENRE_BOOK_QUERY)) {
-            statement.setInt(1, authorId);
-            statement.setInt(2, bookId);
+            int i = 1;
+            statement.setInt(i++, authorId);
+            statement.setInt(i++, bookId);
             statement.execute();
         }
     }
 
     public void removeGenresFromBook(int bookId, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(DELETE_GENRE_BOOK_QUERY)) {
-            statement.setInt(1, bookId);
+            int i = 1;
+            statement.setInt(i++, bookId);
             statement.executeUpdate();
         }
     }

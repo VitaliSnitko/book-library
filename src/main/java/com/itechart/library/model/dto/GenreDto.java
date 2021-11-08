@@ -1,14 +1,17 @@
 package com.itechart.library.model.dto;
 
-public class GenreDto {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-    private final String name;
+@SuperBuilder
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class GenreDto extends Dto {
 
-    public GenreDto(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    private String name;
 }

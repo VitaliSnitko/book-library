@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RecordDao extends Dao<RecordEntity> {
+
     List<RecordEntity> getRecordsByBookId(int bookId);
 
     Optional<RecordEntity> getByEmailInCurrentBook(String email, int bookId, Connection connection);

@@ -11,5 +11,4 @@ public interface ReaderDao extends Dao<ReaderEntity> {
     List<ReaderEntity> getAll();
 
     Optional<ReaderEntity> getByEmail(String email, Connection connection);
-
 }

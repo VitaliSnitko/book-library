@@ -1,24 +1,25 @@
 package com.itechart.library.model.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 
-@Builder
-@Getter
+@SuperBuilder
+@Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookDto {
+public class BookDto extends Dto {
 
-    private int id;
     private String title;
-    List<AuthorDto> authorDtos;
-    List<GenreDto> genreDtos;
+    private List<AuthorDto> authorDtos;
+    private List<GenreDto> genreDtos;
     private String publisher;
     private LocalDate publishDate;
     private int pageCount;

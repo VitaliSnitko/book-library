@@ -4,6 +4,7 @@ import com.itechart.library.dao.AuthorDao;
 import com.itechart.library.dao.BaseDao;
 import com.itechart.library.model.entity.AuthorEntity;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,17 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@SuppressWarnings("UnusedAssignment")
 @Log4j
 public class AuthorDaoImpl extends BaseDao implements AuthorDao {
 
     private static final String INSERT_QUERY = "INSERT INTO author (id, name) VALUES (DEFAULT, ?) RETURNING id";
     private static final String SELECT_BY_ID_QUERY = "SELECT * FROM author WHERE id = ?";
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM author WHERE name = ?";
+    public static final String ID_LABEL = "id";
+    public static final String NAME_LABEL = "name";
 
     @Override
     public AuthorEntity create(AuthorEntity author, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY)) {
-            statement.setString(1, author.getName());
+            int i = 1;
+            statement.setString(i++, author.getName());
             statement.execute();
             author.setId(getIdAfterInserting(statement));
         }
@@ -37,15 +42,18 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
     }
 
     @Override
-    public void update(AuthorEntity entity, Connection connection) {
+    public AuthorEntity update(AuthorEntity entity, Connection connection) {
+        throw new NotImplementedException("This method is not implemented for AuthorDao");
     }
 
     @Override
     public void delete(Integer[] ids) {
+        throw new NotImplementedException("This method is not implemented for AuthorDao");
     }
 
     @Override
     public void delete(Integer[] ids, Connection connection) throws SQLException {
+        throw new NotImplementedException("This method is not implemented for AuthorDao");
     }
 
     @Override
@@ -85,8 +93,8 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
         try {
             while (resultSet.next()) {
                 authorEntities.add(AuthorEntity.builder()
-                        .id(resultSet.getInt(1))
-                        .name(resultSet.getString(2))
+                        .id(resultSet.getInt(ID_LABEL))
+                        .name(resultSet.getString(NAME_LABEL))
                         .build());
             }
         } catch (SQLException e) {

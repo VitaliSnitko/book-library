@@ -6,9 +6,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Maps HTTP request and action
+ */
 public class ActionFactory {
 
+    /**
+     * HashMap that contains key in format "[HTTP method]/[Relative path to resource]"
+     * and a value of {@link Action} implementation
+     */
     private final Map<String, Action> actionPerURL;
+
     private static volatile ActionFactory instance;
 
     private ActionFactory() {

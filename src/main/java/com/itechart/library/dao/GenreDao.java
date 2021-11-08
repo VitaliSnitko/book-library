@@ -7,5 +7,4 @@ import java.util.Optional;
 public interface GenreDao extends Dao<GenreEntity> {
 
     Optional<GenreEntity> getByName(String name);
-
 }

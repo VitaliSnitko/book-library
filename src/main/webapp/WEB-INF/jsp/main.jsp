@@ -30,92 +30,108 @@
     </div>
   </div>
 </nav>
-<div class="container">
-  <form action="delete" method="post">
-    <div class="row mt-2">
-      <div class="col-12 col-sm-8 col-lg-5">
-        <div class="list-group">
-          <c:forEach var="bookDto" items="${requestScope.bookList}">
-            <a href="<c:url value="/edit?id=${bookDto.id}"/>" class="list-group-item list-group-item-action d-flex">
-              <div class="image-parent">
-                <c:choose>
-                  <c:when test="${bookDto.base64Cover.equals(\"\")}">
-                    <img class="img-fluid rounded cover" src="../../images/placeholder-cover.png"
-                         alt="lorem">
-                  </c:when>
-                  <c:otherwise>
-                    <img class="img-fluid rounded cover"
-                         src="data:image/jpeg;base64,${bookDto.base64Cover}"
-                         alt="lorem">
-                  </c:otherwise>
-                </c:choose>
-              </div>
-              <div class="flex-column ms-3">
-                <h4>${bookDto.title}</h4>
-                <p><small>
-                    ${bookDto.authorDtos.get(0).name}
-                  <c:if test="${bookDto.authorDtos.size() > 1}">
-                    <c:forEach var="authorEntity" items="${bookDto.authorDtos}" begin="1">
-                      , ${authorEntity.name}
-                    </c:forEach>
-                  </c:if>
-                </small></p>
-                <c:choose>
-                  <c:when test="${bookDto.availableBookAmount == 0}">
-                    <span class="badge rounded-pill bg-danger"> 0 Copies in Stock</span>
-                  </c:when>
-                  <c:otherwise>
-                    <span class="badge rounded-pill bg-info"> ${bookDto.availableBookAmount} Copies in Stock</span>
-                  </c:otherwise>
-                </c:choose>
-                <small class="publish-date text-muted"><b>Publish date:</b> ${bookDto.publishDate}
-                </small>
-                <div class="form-check">
-                  <label>
-                    <input class="form-check-input" type="checkbox" name="delete" value="${bookDto.id}">
-                  </label>
-                </div>
-              </div>
-            </a>
-          </c:forEach>
+<c:set var="bookList" value="${requestScope.bookList}"/>
+<c:choose>
+  <c:when test="${bookList.isEmpty()}">
+    <div class="container mt-5">
+      <input type="hidden" name="id" value="${param.id}"/>
+      <div class="row justify-content-center">
+        <div class="col-6">
+          <p class="fs-2 text-center">Books with this parameters were not found</p>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="alert alert-danger d-none position-fixed bottom-0 end-0 col-2" role="alert">
-        Delete selected books?
-        <button class="btn btn-danger" type="submit">Ok</button>
-      </div>
+  </c:when>
+  <c:otherwise>
+    <div class="container">
+      <form action="delete" method="post">
+        <div class="row mt-2">
+          <div class="col-12 col-sm-8 col-lg-5">
+            <div class="list-group">
+              <c:forEach var="bookDto" items="${requestScope.bookList}">
+                <a href="<c:url value="/edit?id=${bookDto.id}"/>" class="list-group-item list-group-item-action d-flex">
+                  <div class="image-parent">
+                    <c:choose>
+                      <c:when test="${bookDto.base64Cover.equals(\"\")}">
+                        <img class="img-fluid rounded cover" src="../../images/placeholder-cover.png"
+                             alt="lorem">
+                      </c:when>
+                      <c:otherwise>
+                        <img class="img-fluid rounded cover"
+                             src="data:image/jpeg;base64,${bookDto.base64Cover}"
+                             alt="lorem">
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                  <div class="flex-column ms-3">
+                    <h4>${bookDto.title}</h4>
+                    <p><small>
+                        ${bookDto.authorDtos.get(0).name}
+                      <c:if test="${bookDto.authorDtos.size() > 1}">
+                        <c:forEach var="authorEntity" items="${bookDto.authorDtos}" begin="1">
+                          , ${authorEntity.name}
+                        </c:forEach>
+                      </c:if>
+                    </small></p>
+                    <c:choose>
+                      <c:when test="${bookDto.availableBookAmount == 0}">
+                        <span class="badge rounded-pill bg-danger"> 0 Copies in Stock</span>
+                      </c:when>
+                      <c:otherwise>
+                        <span class="badge rounded-pill bg-info"> ${bookDto.availableBookAmount} Copies in Stock</span>
+                      </c:otherwise>
+                    </c:choose>
+                    <small class="publish-date text-muted"><b>Publish date:</b> ${bookDto.publishDate}
+                    </small>
+                    <div class="form-check">
+                      <label>
+                        <input class="form-check-input" type="checkbox" name="delete" value="${bookDto.id}">
+                      </label>
+                    </div>
+                  </div>
+                </a>
+              </c:forEach>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="alert alert-danger d-none position-fixed bottom-0 end-0 col-2" role="alert">
+            Delete selected books?
+            <button class="btn btn-danger" type="submit">Ok</button>
+          </div>
+        </div>
+      </form>
+
+      <c:set var="pageAmount" value="${requestScope.pageAmount}"/>
+
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <c:if test="${param.page != null && param.page != 1}">
+            <li class="page-item">
+              <a class="page-link prevPageButt" href="" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          </c:if>
+
+          <c:forEach var="pageNum" begin="1" end="${pageAmount}">
+            <li class="page-item"><a class="page-link pageButt" href="">${pageNum}</a></li>
+          </c:forEach>
+
+          <c:if test="${param.page != pageAmount && requestScope.bookList.size() != 0 && pageAmount != 1}">
+            <li class="page-item">
+
+              <a class="page-link nextPageButt" href="" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </c:if>
+        </ul>
+      </nav>
     </div>
-  </form>
+  </c:otherwise>
+</c:choose>
 
-  <c:set var="pageAmount" value="${requestScope.pageAmount}"/>
-
-  <nav aria-label="Page navigation example">
-    <ul class="pagination">
-      <c:if test="${param.page != null && param.page != 1}">
-        <li class="page-item">
-          <a class="page-link prevPageButt" href="" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-      </c:if>
-
-      <c:forEach var="pageNum" begin="1" end="${pageAmount}">
-        <li class="page-item"><a class="page-link pageButt" href="">${pageNum}</a></li>
-      </c:forEach>
-
-      <c:if test="${param.page != pageAmount && requestScope.bookList.size() != 0}">
-        <li class="page-item">
-
-          <a class="page-link nextPageButt" href="" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </c:if>
-    </ul>
-  </nav>
-</div>
 
 </body>
 </html>

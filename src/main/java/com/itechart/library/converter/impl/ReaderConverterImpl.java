@@ -1,12 +1,12 @@
 package com.itechart.library.converter.impl;
 
-import com.itechart.library.converter.ReaderConverter;
+import com.itechart.library.converter.DtoRequestReaderConverter;
 import com.itechart.library.model.dto.ReaderDto;
 import com.itechart.library.model.entity.ReaderEntity;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class ReaderConverterImpl implements ReaderConverter {
+public class ReaderConverterImpl implements DtoRequestReaderConverter {
 
     @Override
     public ReaderEntity toEntity(ReaderDto readerDto) {

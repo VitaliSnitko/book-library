@@ -1,5 +1,7 @@
 package com.itechart.library.connection;
 
+import lombok.extern.log4j.Log4j;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,6 +10,7 @@ import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+@Log4j
 public class ConnectionPool {
 
     private static volatile ConnectionPool connectionPool;
@@ -42,7 +45,7 @@ public class ConnectionPool {
         try {
             properties.load(getClass().getClassLoader().getResourceAsStream("database.properties"));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e);
         }
 
         url = properties.getProperty("url");
@@ -56,7 +59,7 @@ public class ConnectionPool {
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            log.error(e);
         }
         connections = new ArrayBlockingQueue<>(connectionsLimit);
         while (connections.size() != connectionsLimit) {
@@ -64,7 +67,7 @@ public class ConnectionPool {
                 Connection connection = DriverManager.getConnection(url, username, password);
                 connections.put(connection);
             } catch (SQLException | InterruptedException e) {
-                e.printStackTrace();
+                log.error(e);
             }
         }
     }
@@ -74,7 +77,7 @@ public class ConnectionPool {
         try {
             currentConnection = connections.take();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e);
         }
         return currentConnection;
     }
@@ -83,7 +86,7 @@ public class ConnectionPool {
         try {
             connections.put(connection);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 }

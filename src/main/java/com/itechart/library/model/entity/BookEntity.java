@@ -1,15 +1,20 @@
 package com.itechart.library.model.entity;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.InputStream;
 import java.sql.Date;
 import java.util.List;
-import java.util.Objects;
 
 @SuperBuilder
-@Getter
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookEntity extends Entity {
 
     private String title;
@@ -23,28 +28,4 @@ public class BookEntity extends Entity {
     private InputStream cover;
     private int availableBookAmount;
     private int totalBookAmount;
-
-    public void setAuthorEntities(List<AuthorEntity> authorEntities) {
-        this.authorEntities = authorEntities;
-    }
-
-    public void setGenreEntities(List<GenreEntity> genreEntities) {
-        this.genreEntities = genreEntities;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        BookEntity that = (BookEntity) o;
-        return pageCount == that.pageCount && title.equals(that.title) && publisher.equals(that.publisher)
-                && publishDate.equals(that.publishDate) && ISBN.equals(that.ISBN)
-                && Objects.equals(description, that.description) && Objects.equals(cover, that.cover);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), title, publisher, publishDate, pageCount, ISBN, description, cover);
-    }
 }

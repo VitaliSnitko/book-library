@@ -4,11 +4,11 @@ let nameAddInput = document.getElementById('recordName');
 let suggBox = document.getElementsByClassName("autocom-box")[0];
 
 emailAddInput.onkeyup = (e) => {
-    let actualInput = e.target.value;
+    let actualEmailInput = e.target.value;
     let suggestionContainer = [];
-    if (actualInput) {
+    if (actualEmailInput) {
         suggestionContainer = emailSuggestions.filter((emailSuggestion) => {
-            return emailSuggestion.toLocaleLowerCase().startsWith(actualInput.toLocaleLowerCase());
+            return emailSuggestion.toLocaleLowerCase().startsWith(actualEmailInput.toLocaleLowerCase());
         }).map((emailSuggestion) => {
             return `<li>${emailSuggestion}</li>`;
         });
@@ -23,12 +23,29 @@ emailAddInput.onkeyup = (e) => {
     } else {
         searchWrapper.classList.remove("active"); //hide autocomplete box
     }
+
+    disableAddButtonIfReaderAlreadyHasThisBook();
+}
+
+nameAddInput.onkeyup = (e) => {
+    disableAddButtonIfReaderAlreadyHasThisBook();
 }
 
 function select(element) {
     emailAddInput.value = element.textContent;
     nameAddInput.value = nameSuggestions[emailSuggestions.indexOf(element.textContent)];
     searchWrapper.classList.remove("active");
+    disableAddButtonIfReaderAlreadyHasThisBook();
+}
+
+function disableAddButtonIfReaderAlreadyHasThisBook(actualInput) {
+    let addRecordButton = document.getElementsByClassName('save-record')[0];
+    if (document.getElementsByClassName(document.querySelector("#recordEmail").value).length !== 0
+        && document.getElementsByClassName(document.querySelector("#recordName").value).length !== 0) {
+        addRecordButton.setAttribute("disabled", "disabled");
+    } else {
+        addRecordButton.removeAttribute("disabled");
+    }
 }
 
 function showSuggestions(list) {
