@@ -2,27 +2,33 @@ let searchWrapper = document.getElementsByClassName('search-input')[0];
 let emailAddInput = document.getElementById('recordEmail');
 let nameAddInput = document.getElementById('recordName');
 let suggBox = document.getElementsByClassName("autocom-box")[0];
+let timeout = null;
 
 emailAddInput.onkeyup = (e) => {
     let actualEmailInput = e.target.value;
-    let suggestionContainer = [];
-    if (actualEmailInput) {
-        suggestionContainer = emailSuggestions.filter((emailSuggestion) => {
-            return emailSuggestion.toLocaleLowerCase().startsWith(actualEmailInput.toLocaleLowerCase());
-        }).map((emailSuggestion) => {
-            return `<li>${emailSuggestion}</li>`;
-        });
-        searchWrapper.classList.add("active"); //show autocomplete box
-        if (suggestionContainer.length !== 0) {
-            showSuggestions(suggestionContainer);
-        }
-        let allList = suggBox.querySelectorAll("li");
-        for (let i = 0; i < allList.length; i++) {
-            allList[i].setAttribute("onclick", "select(this)");
-        }
-    } else {
-        searchWrapper.classList.remove("active"); //hide autocomplete box
-    }
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        console.log('Input Value:', emailAddInput.value);
+    }, 1000);
+
+    // let suggestionContainer = [];
+    // if (actualEmailInput) {
+    //     suggestionContainer = emailSuggestions.filter((emailSuggestion) => {
+    //         return emailSuggestion.toLocaleLowerCase().startsWith(actualEmailInput.toLocaleLowerCase());
+    //     }).map((emailSuggestion) => {
+    //         return `<li>${emailSuggestion}</li>`;
+    //     });
+    //     searchWrapper.classList.add("active"); //show autocomplete box
+    //     if (suggestionContainer.length !== 0) {
+    //         showSuggestions(suggestionContainer);
+    //     }
+    //     let allList = suggBox.querySelectorAll("li");
+    //     for (let i = 0; i < allList.length; i++) {
+    //         allList[i].setAttribute("onclick", "select(this)");
+    //     }
+    // } else {
+    //     searchWrapper.classList.remove("active"); //hide autocomplete box
+    // }
 
     disableAddButtonIfReaderAlreadyHasThisBook();
 }

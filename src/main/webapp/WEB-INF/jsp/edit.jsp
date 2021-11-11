@@ -62,12 +62,14 @@
             </div>
             <div class="modal-body">
               <label for="recordEmail" class="form-label">Email</label>
-              <div class="search-input">
-                <input type="email" class="form-control mb-2" id="recordEmail" required>
-                <div class="autocom-box">
-                  <!-- here list are inserted from javascript -->
+              <form action="autocomplete">
+                <div class="search-input">
+                  <input type="email" class="form-control mb-2" id="recordEmail" required>
+                  <div class="autocom-box">
+                    <!-- here list are inserted from javascript -->
+                  </div>
                 </div>
-              </div>
+              </form>
               <label for="recordName" class="form-label">Name</label>
               <input type="text" class="form-control mb-2" id="recordName" required>
               <label for="recordPeriod" class="form-label">Time period</label>
