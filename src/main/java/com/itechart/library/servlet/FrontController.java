@@ -16,7 +16,7 @@ import java.io.IOException;
  * {@code FrontController} is central controller designed to map HTTP requests
  * and actions through {@link ActionFactory}.
  */
-@WebServlet({"/main", "/add", "/edit", "/delete", "/search"})
+@WebServlet({"/main", "/add", "/edit", "/delete", "/search", "/autocomplete"})
 @MultipartConfig(maxFileSize = 2_097_152)
 public class FrontController extends HttpServlet {
 
