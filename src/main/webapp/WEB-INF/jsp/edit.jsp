@@ -45,7 +45,7 @@
       <input type="hidden" name="id" value="${param.id}"/>
       <div class="row justify-content-center">
         <div class="col-6">
-          <p class="fs-2 text-center">Such book does not exist</p>
+          <p class="fs-2 text-center">The book was deleted or not created</p>
         </div>
       </div>
     </div>
@@ -140,6 +140,9 @@
           <div class="col-sm-4">
             <input type="text" name="title" class="form-control" id="validationCustom01" value="${bookDto.title}"
                    required>
+            <div class="invalid-feedback">
+              Field should not be empty
+            </div>
           </div>
         </div>
         <div class="row mb-1 justify-content-center">
@@ -175,6 +178,9 @@
             <input type="text" name="publisher" class="form-control" id="validationCustom03"
                    value="${bookDto.publisher}"
                    required>
+            <div class="invalid-feedback">
+              Field should not be empty
+            </div>
           </div>
         </div>
         <div class="row mb-1 justify-content-center">
@@ -182,6 +188,9 @@
           <div class="col-sm-4">
             <input type="date" name="date" class="form-control" id="validationCustom04" value="${bookDto.publishDate}"
                    required>
+            <div class="invalid-feedback">
+              Field should not be empty
+            </div>
           </div>
         </div>
         <div class="row mb-1 justify-content-center">
@@ -190,6 +199,9 @@
             <input type="text" name="pageCount" class="form-control" id="validationCustom05"
                    value="${bookDto.pageCount}"
                    required pattern="\d+">
+            <div class="invalid-feedback">
+              Field should be a number
+            </div>
           </div>
         </div>
         <div class="row mb-1 justify-content-center">
@@ -197,6 +209,9 @@
           <div class="col-sm-4">
             <input type="text" name="ISBN" class="form-control" id="validationCustom06" value="${bookDto.ISBN}"
                    required>
+            <div class="invalid-feedback">
+              Field should not be empty
+            </div>
           </div>
         </div>
         <div class="row mb-1 justify-content-center">
@@ -204,6 +219,9 @@
           <div class="col-sm-4">
             <input type="text" name="totalBookAmount" class="form-control" id="editTotalAmount"
                    value="${bookDto.totalBookAmount}" required pattern="\d+">
+            <div class="invalid-feedback">
+              Field should be a number
+            </div>
           </div>
         </div>
         <div class="row mb-1 justify-content-center">
@@ -237,7 +255,7 @@
         </div>
         <div class="row mb-2 justify-content-center">
           <div class="col-sm-6">
-            <button class="btn btn-primary me-3" type="submit">Save</button>
+            <button class="btn btn-primary me-3" id="saveButton" type="submit">Save</button>
             <a class="btn btn-secondary" href="<c:url value="/main"/>" role="button">Discard</a>
           </div>
         </div>
@@ -307,38 +325,6 @@
         </div>
       </div>
     </form>
-
-
-    <%--<div style="position:relative;" class="list-group-item list-group-item-action d-flex">--%>
-    <%--  <input type="hidden" name="email" value="${name}">--%>
-    <%--  <input type="hidden" name="name" value="${email}">--%>
-    <%--  <input type="hidden" name="period" value="${period}">--%>
-    <%--  <div style="position: absolute; right: 0" data-bs-toggle="tooltip" data-bs-placement="right"--%>
-    <%--       title="Record was not created. Press 'Save' to save changes or 'Discard' to discard">--%>
-    <%--    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#ffc107"--%>
-    <%--         class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img"--%>
-    <%--         aria-label="Warning:">--%>
-    <%--      <path--%>
-    <%--          d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"></path>--%>
-    <%--    </svg>--%>
-    <%--  </div>--%>
-    <%--  <div class="trash-icon" style="position: absolute; right: 12; bottom: 4" onclick="deleteRecord(this)">--%>
-    <%--    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash"--%>
-    <%--         viewBox="0 0 16 16">--%>
-    <%--      <path--%>
-    <%--          d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>--%>
-    <%--      <path fill-rule="evenodd"--%>
-    <%--            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>--%>
-    <%--    </svg>--%>
-    <%--  </div>--%>
-    <%--  <div class="flex-column">--%>
-    <%--    <a href="#">${name}</a>--%>
-    <%--    <p><small>${email}</small></p>--%>
-    <%--    <span class="badge rounded-pill bg-info"></span>--%>
-    <%--  </div>--%>
-    <%--</div>--%>
-
-
     <script>
         let emailSuggestions = [
             <c:forEach var="email" items="${requestScope.emailSuggestions}">

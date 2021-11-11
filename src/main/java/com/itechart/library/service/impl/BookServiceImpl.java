@@ -62,6 +62,7 @@ public class BookServiceImpl implements BookService {
             return;
         }
         BookEntity bookEntity = bookConverter.toEntity(bookDto);
+        bookEntity.setAvailableBookAmount(bookDao.getById(bookEntity.getId()).get().getAvailableBookAmount());
         bookDao.update(bookEntity, connection);
         saveAuthorsAndGenres(bookEntity, connection);
     }
@@ -125,5 +126,4 @@ public class BookServiceImpl implements BookService {
             genreBookDao.setGenreToBook(optionalGenre.get().getId(), bookEntity.getId(), connection);
         }
     }
-
 }

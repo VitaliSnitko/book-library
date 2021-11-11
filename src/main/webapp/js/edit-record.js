@@ -19,14 +19,13 @@ function setInputs(e) {
 }
 
 let statusModalInput = document.getElementById('editRecordStatus');
-
 let editRecordButton = document.getElementsByClassName("save-record")[1];
+let status = document.getElementById('editStatus');
+
 
 editRecordButton.onclick = function () {
     let record = document.querySelector('input[name="recordId"][value="' + recordIdInput.value + '"]');
     let recordStatus = record.previousElementSibling;
-
-    let status = document.getElementById('editStatus');
     let arrStatus = status.value.split(' ');
     if (arrStatus[0] === 'Unavailable') {
         arrStatus = ['Available', 0, 'out', 'of', document.getElementById('editTotalAmount').value];
@@ -69,6 +68,17 @@ statusModalInput.onchange = function () {
         document.getElementById('editRecordModalButton').setAttribute('disabled', 'disabled');
     } else {
         document.getElementById('editRecordModalButton').removeAttribute('disabled');
+    }
+}
+
+let totalAmountInput = document.querySelector("#editTotalAmount");
+
+totalAmountInput.oninput = function () {
+    let arrStatus = status.value.split(' ');
+    if (totalAmountInput.value < arrStatus[4] - arrStatus[1]) {
+        document.querySelector("#saveButton").setAttribute('disabled', 'disabled');
+    } else {
+        document.querySelector("#saveButton").removeAttribute('disabled');
     }
 }
 

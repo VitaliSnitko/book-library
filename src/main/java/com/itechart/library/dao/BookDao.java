@@ -11,8 +11,8 @@ public interface BookDao extends Dao<BookEntity> {
 
     /**
      * @param specification contains search parameters (optionally in regex form)
-     * @param limit specifies book amount on one page
-     * @param offset specifies number of books to skip
+     * @param limit         specifies book amount on one page
+     * @param offset        specifies number of books to skip
      * @return Book list that meets specification and locates in limit-offset range
      */
     List<BookEntity> getLimitOffsetBySpecification(BookSpecification specification, int limit, int offset);

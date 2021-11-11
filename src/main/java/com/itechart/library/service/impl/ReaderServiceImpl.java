@@ -37,7 +37,7 @@ import java.util.Optional;
 @Log4j
 public class ReaderServiceImpl implements ReaderService {
 
-    private final EmailScheduleManager scheduleManager = EmailScheduleManager.getInstance();
+    private final EmailScheduleManager scheduleManager;
 
     private final ReaderDao readerDao;
     private final RecordDao recordDao;
@@ -55,12 +55,14 @@ public class ReaderServiceImpl implements ReaderService {
         this.bookDao = DaoFactory.getDao(BookDaoImpl.class);
         this.readerDao = DaoFactory.getDao(ReaderDaoImpl.class);
         this.recordDao = DaoFactory.getDao(RecordDaoImpl.class);
+        this.scheduleManager = EmailScheduleManager.getInstance();
     }
 
-    public ReaderServiceImpl(BookDao bookDao, ReaderDao readerDao, RecordDao recordDao) {
+    public ReaderServiceImpl(BookDao bookDao, ReaderDao readerDao, RecordDao recordDao, EmailScheduleManager scheduleManager) {
         this.bookDao = bookDao;
         this.readerDao = readerDao;
         this.recordDao = recordDao;
+        this.scheduleManager = scheduleManager;
     }
 
     @Override
@@ -85,12 +87,11 @@ public class ReaderServiceImpl implements ReaderService {
             } else {
                 totalBookAmount--;
             }
-            bookDao.updateAvailableAmount(availableBookAmount, bookId, connection);
-            bookDao.updateTotalAmount(totalBookAmount, bookId, connection);
             updateRecord(connection, recordDto);
             unscheduleJobs(recordDto);
         }
-
+        bookDao.updateAvailableAmount(availableBookAmount, bookId, connection);
+        bookDao.updateTotalAmount(totalBookAmount, bookId, connection);
     }
 
     @Override
@@ -167,12 +168,12 @@ public class ReaderServiceImpl implements ReaderService {
         return newReaderEntity;
     }
 
-    public void scheduleJobs(RecordEntity recordEntity) {
+    private void scheduleJobs(RecordEntity recordEntity) {
         createDueDateReminder(recordEntity);
         createOverdueReminder(recordEntity);
     }
 
-    public void unscheduleJobs(RecordDto recordDto) {
+    private void unscheduleJobs(RecordDto recordDto) {
         scheduleManager.unsubscribe(recordDto, DUE_DATE_REMINDER_STRING);
         scheduleManager.unsubscribe(recordDto, OVERDUE_REMINDER_STRING);
     }

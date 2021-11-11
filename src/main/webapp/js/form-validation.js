@@ -2,7 +2,7 @@
     'use strict'
 
     // Получите все формы, к которым мы хотим применить пользовательские стили проверки Bootstrap
-    var forms = document.querySelectorAll('.needs-validation')
+    let forms = document.querySelectorAll('.needs-validation')
 
     // Зацикливайтесь на них и предотвращайте отправку
     Array.prototype.slice.call(forms)

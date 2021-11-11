@@ -103,7 +103,7 @@ public class BookConverterImpl implements BookConverter {
         return "";
     }
 
-    private InputStream getCover(HttpServletRequest req){
+    private InputStream getCover(HttpServletRequest req) {
         try {
             return req.getPart("cover").getInputStream().available() == 0 ?
                     null :

@@ -68,7 +68,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
                 isbn         = ?,
                 description  = ?,
                 cover        = COALESCE(?, cover),
-                available    = ? - total_amount + available,
+                available    = ?,
                 total_amount = ?
             WHERE id = ?""";
     private static final String SELECT_BOOK_COUNT_WITH_PARAMETERS = """
@@ -128,7 +128,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setInt(i++, offset);
             return getBookListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
-            log.error("Cannot get books ", e);
+            log.error(e);
         } finally {
             connectionPool.returnToPool(connection);
         }
@@ -152,7 +152,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             statement.setString(i++, book.getISBN());
             statement.setString(i++, book.getDescription());
             statement.setBinaryStream(i++, book.getCover());
-            statement.setInt(i++, book.getTotalBookAmount());
+            statement.setInt(i++, book.getAvailableBookAmount());
             statement.setInt(i++, book.getTotalBookAmount());
             statement.setInt(i++, book.getId());
             statement.executeUpdate();
@@ -172,7 +172,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             }
             statement.executeUpdate();
         } catch (SQLException e) {
-            log.error("Cannot delete books ", e);
+            log.error(e);
         } finally {
             connectionPool.returnToPool(connection);
         }
@@ -196,7 +196,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
             resultSet.next();
             return resultSet.getInt("count");
         } catch (SQLException e) {
-            log.error("Cannot get count of books ", e);
+            log.error(e);
             return -1;
         } finally {
             connectionPool.returnToPool(connection);

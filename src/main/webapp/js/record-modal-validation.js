@@ -1,6 +1,6 @@
 (function () {
     'use strict'
-    var recordForm = document.getElementsByClassName("record-form")[0];
+    let recordForm = document.getElementsByClassName("record-form")[0];
     recordForm.addEventListener('submit', function (event) {
         if (!recordForm.checkValidity()) {
             recordForm.classList.add('was-validated')

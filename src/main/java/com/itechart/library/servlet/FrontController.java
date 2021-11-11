@@ -29,6 +29,7 @@ public class FrontController extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         Action action = actionFactory.getAction(req);
         doForwardOrRedirect(action.execute(req, resp), req, resp);
     }

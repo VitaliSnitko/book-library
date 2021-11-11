@@ -7,6 +7,7 @@ import com.itechart.library.model.entity.ReaderEntity;
 import com.itechart.library.model.entity.RecordEntity;
 import com.itechart.library.model.entity.Status;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
     public static final String BORROW_DATE_LABEL = "borrow_date";
     public static final String DUE_DATE_LABEL = "due_date";
     public static final String RETURN_DATE_LABEL = "return_date";
+    public static final String NOT_IMPLEMENTED_MESSAGE = "This method is not implemented for RecordDao";
 
     @Override
     public RecordEntity create(RecordEntity recordEntity, Connection connection) throws SQLException {
@@ -72,10 +74,12 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
 
     @Override
     public void delete(Integer[] ids) {
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
     public void delete(Integer[] ids, Connection connection) throws SQLException {
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
@@ -85,7 +89,7 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
             statement.setInt(1, bookId);
             return getRecordListFromResultSet(statement.executeQuery());
         } catch (SQLException e) {
-            log.error("Cannot get books ", e);
+            log.error(e);
             return new ArrayList<>();
         } finally {
             connectionPool.returnToPool(connection);
@@ -112,7 +116,7 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
                         .build());
             }
         } catch (SQLException e) {
-            log.error("Cannot get by email ", e);
+            log.error(e);
         }
         return recordEntity;
     }
@@ -127,7 +131,7 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
                 return resultSet.getDate(1);
             }
         } catch (SQLException e) {
-            log.error("Cannot get books ", e);
+            log.error(e);
         } finally {
             connectionPool.returnToPool(connection);
         }
@@ -159,5 +163,4 @@ public class RecordDaoImpl extends BaseDao implements RecordDao {
         }
         return recordList;
     }
-
 }

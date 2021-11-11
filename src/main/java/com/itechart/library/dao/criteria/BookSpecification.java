@@ -25,6 +25,7 @@ public class BookSpecification {
      * that can be used for soft-searching with multiple parameters in one field.
      * E.g. typing "Andrew, Bob" in «Authors» field will return books that contains
      * in authors either Andrew or Bob. Matches all strings if parameters were not specified
+     *
      * @return formatted specification
      */
     public BookSpecification convertSpecificationParametersToRegex() {

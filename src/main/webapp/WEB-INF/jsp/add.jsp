@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
   <meta charset="utf-8">
@@ -22,9 +22,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <div class="navbar-nav">
-        <a class="nav-link" aria-current="page" href="/main">Home</a>
-        <a class="nav-link active" href="/add">Add book</a>
-        <a class="nav-link" href="/search" tabindex="-1">Search</a>
+        <a class="nav-link" aria-current="page" href="<c:url value="/main"/>">Home</a>
+        <a class="nav-link active" href="<c:url value="/add"/>">Add book</a>
+        <a class="nav-link" href="<c:url value="/search"/>" tabindex="-1">Search</a>
       </div>
     </div>
   </div>
@@ -35,6 +35,9 @@
       <label for="validationCustom01" class="form-label col-sm-2 col-form-label">Title</label>
       <div class="col-sm-4">
         <input type="text" name="title" class="form-control" id="validationCustom01" required>
+        <div class="invalid-feedback">
+          Field should not be empty
+        </div>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
@@ -65,30 +68,45 @@
       <label for="validationCustom03" class="form-label col-sm-2 col-form-label">Publisher</label>
       <div class="col-sm-4">
         <input type="text" name="publisher" class="form-control" id="validationCustom03" required>
+        <div class="invalid-feedback">
+          Field should not be empty
+        </div>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
       <label for="validationCustom04" class="form-label col-sm-2 col-form-label">Publish date</label>
       <div class="col-sm-4">
         <input type="date" name="date" class="form-control" id="validationCustom04" required>
+        <div class="invalid-feedback">
+          Field should not be empty
+        </div>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
       <label for="validationCustom05" class="form-label col-sm-2 col-form-label">Page count</label>
       <div class="col-sm-4">
         <input type="text" name="pageCount" class="form-control" id="validationCustom05" required pattern="\d+">
+        <div class="invalid-feedback">
+          Field should be a number
+        </div>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
       <label for="validationCustom06" class="form-label col-sm-2 col-form-label">ISBN</label>
       <div class="col-sm-4">
         <input type="text" name="ISBN" class="form-control" id="validationCustom06" required>
+        <div class="invalid-feedback">
+          Field should not be empty
+        </div>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
       <label for="validationCustom08" class="form-label col-sm-2 col-form-label">Total book amount</label>
       <div class="col-sm-4">
         <input type="text" name="totalBookAmount" class="form-control" id="validationCustom08" required pattern="\d+">
+        <div class="invalid-feedback">
+          Field should be a number
+        </div>
       </div>
     </div>
     <div class="row mb-3 justify-content-center">
@@ -109,7 +127,7 @@
     <div class="row mb-3 justify-content-center">
       <div class="col-sm-6">
         <button class="btn btn-primary me-3" type="submit">Save</button>
-        <a class="btn btn-secondary" href="/main" role="button">Discard</a>
+        <a class="btn btn-secondary" href="<c:url value="/main"/>" role="button">Discard</a>
       </div>
     </div>
   </form>

@@ -2,8 +2,7 @@ package com.itechart.library.servlet.validator;
 
 import javax.servlet.http.HttpServletRequest;
 
-public enum BookFormValidator implements Validator {
-    INSTANCE;
+public class BookFormValidator implements Validator {
 
     private static final String AUTHORS_PATTERN = ".+ *(, *.+)*";
     private static final String GENRES_PATTERN = ".+ *(, *.+)*";

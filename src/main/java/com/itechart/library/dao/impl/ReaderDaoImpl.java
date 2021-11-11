@@ -25,6 +25,7 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
     public static final String ID_LABEL = "id";
     public static final String EMAIL_LABEL = "email";
     public static final String FIRST_NAME_LABEL = "first_name";
+    public static final String NOT_IMPLEMENTED_MESSAGE = "This method is not implemented for ReaderDao";
 
     @Override
     public ReaderEntity create(ReaderEntity reader, Connection connection) throws SQLException {
@@ -77,12 +78,12 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
 
     @Override
     public void delete(Integer[] ids) {
-        throw new NotImplementedException("This method is not implemented for ReaderDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
     public void delete(Integer[] ids, Connection connection) throws SQLException {
-        throw new NotImplementedException("This method is not implemented for ReaderDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
@@ -99,7 +100,7 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
                         .build());
             }
         } catch (SQLException e) {
-            log.error("Cannot get by email ", e);
+            log.error(e);
         }
         return readerEntity;
     }

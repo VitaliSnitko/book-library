@@ -1,4 +1,4 @@
-var uploadField = document.getElementById("cover");
+let uploadField = document.getElementById("cover");
 
 uploadField.onchange = function() {
     if(this.files[0].size > 2097152){

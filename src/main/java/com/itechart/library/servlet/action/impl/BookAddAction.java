@@ -17,13 +17,13 @@ public class BookAddAction implements Action {
 
     private final BookServiceProxy bookService = new BookServiceProxy();
     private final BookConverter bookConverter = new BookConverterImpl();
-    private final BookFormValidator bookValidator = BookFormValidator.INSTANCE;
+    private final BookFormValidator bookValidator = new BookFormValidator();
 
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
         if (bookValidator.isValid(req)) {
             bookService.create(bookConverter.toDtoFromReq(req));
-            return new ActionResult(ActionConstants.BOOK_LIST_PAGE, ActionConstants.redirect);
+            return new ActionResult(ActionConstants.BOOK_LIST_PAGE);
         } else {
             log.warn("Invalid book parameters caught");
             return new ActionResult(ActionConstants.BOOK_ADD_PAGE, ActionConstants.redirect);

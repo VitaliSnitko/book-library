@@ -24,6 +24,7 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM genre WHERE name = ?";
     public static final String ID_LABEL = "id";
     public static final String NAME_LABEL = "name";
+    public static final String NOT_IMPLEMENTED_MESSAGE = "This method is not implemented for GenreDao";
 
     @Override
     public GenreEntity create(GenreEntity genre, Connection connection) throws SQLException {
@@ -44,17 +45,17 @@ public class GenreDaoImpl extends BaseDao implements GenreDao {
 
     @Override
     public GenreEntity update(GenreEntity entity, Connection connection) {
-        throw new NotImplementedException("This method is not implemented for GenreDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
     public void delete(Integer[] ids) {
-        throw new NotImplementedException("This method is not implemented for GenreDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
     public void delete(Integer[] ids, Connection connection) throws SQLException {
-        throw new NotImplementedException("This method is not implemented for GenreDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override

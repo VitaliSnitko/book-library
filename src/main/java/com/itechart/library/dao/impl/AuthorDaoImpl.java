@@ -23,6 +23,7 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
     private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM author WHERE name = ?";
     public static final String ID_LABEL = "id";
     public static final String NAME_LABEL = "name";
+    public static final String NOT_IMPLEMENTED_MESSAGE = "This method is not implemented for AuthorDao";
 
     @Override
     public AuthorEntity create(AuthorEntity author, Connection connection) throws SQLException {
@@ -43,17 +44,17 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
 
     @Override
     public AuthorEntity update(AuthorEntity entity, Connection connection) {
-        throw new NotImplementedException("This method is not implemented for AuthorDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
     public void delete(Integer[] ids) {
-        throw new NotImplementedException("This method is not implemented for AuthorDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
     public void delete(Integer[] ids, Connection connection) throws SQLException {
-        throw new NotImplementedException("This method is not implemented for AuthorDao");
+        throw new NotImplementedException(NOT_IMPLEMENTED_MESSAGE);
     }
 
     @Override
@@ -98,7 +99,7 @@ public class AuthorDaoImpl extends BaseDao implements AuthorDao {
                         .build());
             }
         } catch (SQLException e) {
-            log.error("Result set error ", e);
+            log.error(e);
         }
         return authorEntities;
     }

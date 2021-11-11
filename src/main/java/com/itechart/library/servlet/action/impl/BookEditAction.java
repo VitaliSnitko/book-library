@@ -23,8 +23,8 @@ public class BookEditAction implements Action {
     private final BookServiceProxy bookService = new BookServiceProxy();
     private final ReaderServiceProxy readerService = new ReaderServiceProxy();
     private final BookConverter bookConverter = new BookConverterImpl();
-    private final BookFormValidator bookValidator = BookFormValidator.INSTANCE;
-    private final ReaderValidator readerValidator = ReaderValidator.INSTANCE;
+    private final BookFormValidator bookValidator = new BookFormValidator();
+    private final ReaderValidator readerValidator = new ReaderValidator();
     private final RecordConverter recordConverter = new RecordConverterImpl();
 
     @Override

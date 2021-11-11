@@ -13,6 +13,7 @@ public abstract class BaseDao {
     /**
      * Serves for getting id of entity after inserting entity to database.
      * (Due to "RETURNING" SQL operator)
+     *
      * @return entity id
      */
     protected int getIdAfterInserting(PreparedStatement statement) throws SQLException {

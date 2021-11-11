@@ -60,7 +60,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testThatBookCreateWasCalledOneTime() throws SQLException {
+    public void testBookCreateWasCalledOneTime() throws SQLException {
         //given
         BookDto bookDto = BookDto.builder().build();
         BookEntity bookEntity = createBookEntity();
@@ -75,7 +75,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testThatAuthorCreateWasCalledAsManyTimesAsSizeOfAuthorList() throws SQLException {
+    public void testAuthorCreateWasCalledAsManyTimesAsSizeOfAuthorList() throws SQLException {
         //given
         BookDto bookDto = BookDto.builder().build();
         BookEntity bookEntity = createBookEntity();
@@ -90,7 +90,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testThatGenreCreateWasCalledAsManyTimesAsSizeOfGenreList() throws SQLException {
+    public void testGenreCreateWasCalledAsManyTimesAsSizeOfGenreList() throws SQLException {
         //given
         BookDto bookDto = BookDto.builder().build();
         BookEntity bookEntity = createBookEntity();
