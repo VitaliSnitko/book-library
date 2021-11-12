@@ -11,6 +11,6 @@ public class BookAddPageAction implements Action {
 
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
-        return new ActionResult(ActionConstants.BOOK_ADD_PAGE);
+        return new ActionResult(ActionConstants.BOOK_ADD_SOURCE);
     }
 }

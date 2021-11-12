@@ -31,15 +31,17 @@ public class FrontController extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         Action action = actionFactory.getAction(req);
-        doForwardOrRedirect(action.execute(req, resp), req, resp);
+        doOperationAfterAction(action.execute(req, resp), req, resp);
     }
 
-    private void doForwardOrRedirect(ActionResult actionResult, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (actionResult.isRedirect()) {
-            resp.sendRedirect(actionResult.getPath());
-        } else {
-            String path = "/WEB-INF/jsp/" + actionResult.getPath() + ".jsp";
-            req.getRequestDispatcher(path).forward(req, resp);
+    private void doOperationAfterAction(ActionResult actionResult, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        switch (actionResult.getOperationAfterAction()) {
+            case REDIRECT -> resp.sendRedirect(actionResult.getPath());
+            case FORWARD -> {
+                String path = "/WEB-INF/jsp/" + actionResult.getPath() + ".jsp";
+                req.getRequestDispatcher(path).forward(req, resp);
+            }
+            default -> {}
         }
     }
 }

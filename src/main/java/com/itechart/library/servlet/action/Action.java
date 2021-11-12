@@ -2,6 +2,7 @@ package com.itechart.library.servlet.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public interface Action {
 
@@ -10,5 +11,5 @@ public interface Action {
      *
      * @return {@link ActionResult} class that contains information about post-action redirecting or forwarding
      */
-    ActionResult execute(HttpServletRequest req, HttpServletResponse resp);
+    ActionResult execute(HttpServletRequest req, HttpServletResponse resp) throws IOException;
 }

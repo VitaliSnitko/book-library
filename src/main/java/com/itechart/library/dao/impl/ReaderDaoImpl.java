@@ -21,6 +21,7 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
     private static final String INSERT_QUERY = "INSERT INTO reader (id, email, first_name) VALUES (DEFAULT, ?, ?) RETURNING id";
     private static final String UPDATE_QUERY = "UPDATE reader SET first_name = ? where email = ?";
     private static final String SELECT_ALL_QUERY = "SELECT * FROM reader";
+    private static final String SELECT_BY_EMAIL_INPUT_QUERY = "SELECT * FROM reader WHERE email LIKE ?";
     private static final String SELECT_BY_EMAIL_QUERY = "SELECT * FROM reader WHERE email = ?";
     public static final String ID_LABEL = "id";
     public static final String EMAIL_LABEL = "email";
@@ -47,22 +48,42 @@ public class ReaderDaoImpl extends BaseDao implements ReaderDao {
     @Override
     public List<ReaderEntity> getAll() {
         Connection connection = connectionPool.getConnection();
-        List<ReaderEntity> readerEntity = new ArrayList<>();
+        List<ReaderEntity> readerEntities = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_QUERY)) {
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                readerEntity.add(ReaderEntity.builder()
-                        .id(resultSet.getInt(ID_LABEL))
-                        .email(resultSet.getString(EMAIL_LABEL))
-                        .name(resultSet.getString(FIRST_NAME_LABEL))
-                        .build());
-            }
+            addReadersToList(readerEntities, statement);
         } catch (SQLException e) {
-            log.error("Cannot get by email ", e);
+            log.error(e);
         } finally {
             connectionPool.returnToPool(connection);
         }
-        return readerEntity;
+        return readerEntities;
+    }
+
+    @Override
+    public List<ReaderEntity> getByEmailInput(String email) {
+        Connection connection = connectionPool.getConnection();
+        List<ReaderEntity> readerEntities = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_EMAIL_INPUT_QUERY)) {
+            int i = 1;
+            statement.setString(i++, email + '%');
+            addReadersToList(readerEntities, statement);
+        } catch (SQLException e) {
+            log.error(e);
+        } finally {
+            connectionPool.returnToPool(connection);
+        }
+        return readerEntities;
+    }
+
+    private void addReadersToList(List<ReaderEntity> readerEntities, PreparedStatement statement) throws SQLException {
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            readerEntities.add(ReaderEntity.builder()
+                    .id(resultSet.getInt(ID_LABEL))
+                    .email(resultSet.getString(EMAIL_LABEL))
+                    .name(resultSet.getString(FIRST_NAME_LABEL))
+                    .build());
+        }
     }
 
     @Override

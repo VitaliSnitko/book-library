@@ -6,6 +6,7 @@ import com.itechart.library.service.impl.BookServiceProxy;
 import com.itechart.library.servlet.action.Action;
 import com.itechart.library.servlet.action.ActionConstants;
 import com.itechart.library.servlet.action.ActionResult;
+import com.itechart.library.servlet.action.OperationAfterAction;
 import com.itechart.library.servlet.validator.BookFormValidator;
 import lombok.extern.log4j.Log4j;
 
@@ -23,10 +24,10 @@ public class BookAddAction implements Action {
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
         if (bookValidator.isValid(req)) {
             bookService.create(bookConverter.toDtoFromReq(req));
-            return new ActionResult(ActionConstants.BOOK_LIST_PAGE);
+            return new ActionResult(ActionConstants.BOOK_LIST_SOURCE);
         } else {
             log.warn("Invalid book parameters caught");
-            return new ActionResult(ActionConstants.BOOK_ADD_PAGE, ActionConstants.redirect);
+            return new ActionResult(ActionConstants.BOOK_ADD_SOURCE, OperationAfterAction.REDIRECT);
         }
     }
 }

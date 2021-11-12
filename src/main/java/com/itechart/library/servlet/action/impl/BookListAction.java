@@ -42,7 +42,7 @@ public class BookListAction implements Action {
                 ? new ArrayList<>()
                 : bookService.getLimitOffsetBySpecification(specification, this.pageBookAmount, page));
         req.setAttribute("pageAmount", Math.ceil((float) totalBookAmount / this.pageBookAmount));
-        return new ActionResult(ActionConstants.BOOK_LIST_PAGE);
+        return new ActionResult(ActionConstants.BOOK_LIST_SOURCE);
     }
 
     private int getPage(HttpServletRequest req) {

@@ -20,4 +20,6 @@ public interface ReaderService {
     List<RecordDto> getRecordsByBookId(int bookId);
 
     List<ReaderDto> getAllReaders();
+
+    List<ReaderDto> getReadersByEmailInput(String email);
 }

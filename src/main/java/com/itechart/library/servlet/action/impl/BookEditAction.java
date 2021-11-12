@@ -10,6 +10,7 @@ import com.itechart.library.service.impl.ReaderServiceProxy;
 import com.itechart.library.servlet.action.Action;
 import com.itechart.library.servlet.action.ActionConstants;
 import com.itechart.library.servlet.action.ActionResult;
+import com.itechart.library.servlet.action.OperationAfterAction;
 import com.itechart.library.servlet.validator.BookFormValidator;
 import com.itechart.library.servlet.validator.ReaderValidator;
 import lombok.extern.log4j.Log4j;
@@ -32,7 +33,7 @@ public class BookEditAction implements Action {
 
         if (!bookValidator.isValid(req)) {
             log.warn("Non valid book parameters caught");
-            return new ActionResult(ActionConstants.BOOK_EDIT_PAGE, ActionConstants.redirect);
+            return new ActionResult(ActionConstants.BOOK_EDIT_SOURCE, OperationAfterAction.REDIRECT);
         }
 
         BookDto bookDto = bookConverter.toDtoFromReq(req);
@@ -45,11 +46,11 @@ public class BookEditAction implements Action {
                 createReaderRecords(req, bookDto);
             } else {
                 log.warn("Non valid reader parameters caught");
-                return new ActionResult(ActionConstants.BOOK_EDIT_PAGE, ActionConstants.redirect);
+                return new ActionResult(ActionConstants.BOOK_EDIT_SOURCE, OperationAfterAction.REDIRECT);
             }
         }
 
-        return new ActionResult(ActionConstants.BOOK_LIST_PAGE, ActionConstants.redirect);
+        return new ActionResult(ActionConstants.BOOK_LIST_SOURCE, OperationAfterAction.REDIRECT);
     }
 
     private void updateRecords(HttpServletRequest req) {
