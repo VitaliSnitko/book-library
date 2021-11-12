@@ -26,7 +26,7 @@ public class ActionFactory {
         actionPerURL.put("GET/add", new BookAddPageAction());
         actionPerURL.put("GET/edit", new BookPageAction());
         actionPerURL.put("GET/search", new SearchPageAction());
-        actionPerURL.put("GET/autocomplete", new SearchPageAction());
+        actionPerURL.put("GET/autocomplete", new AutoCompleteAction());
 
         actionPerURL.put("POST/add", new BookAddAction());
         actionPerURL.put("POST/edit", new BookEditAction());

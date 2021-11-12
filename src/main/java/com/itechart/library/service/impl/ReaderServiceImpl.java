@@ -109,6 +109,11 @@ public class ReaderServiceImpl implements ReaderService {
         return readerConverter.toDtos(readerDao.getAll());
     }
 
+    @Override
+    public List<ReaderDto> getReadersByEmailInput(String email) {
+        return readerConverter.toDtos(readerDao.getByEmailInput(email));
+    }
+
     private void updateRecord(Connection connection, RecordDto recordDto) throws SQLException {
         recordDao.update(recordConverter.toEntity(recordDto), connection);
     }

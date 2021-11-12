@@ -11,6 +11,6 @@ public class SearchPageAction implements Action {
 
     @Override
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
-        return new ActionResult(ActionConstants.SEARCH_PAGE);
+        return new ActionResult(ActionConstants.SEARCH_SOURCE);
     }
 }

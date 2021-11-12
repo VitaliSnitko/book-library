@@ -327,18 +327,6 @@
         </div>
       </div>
     </form>
-    <script>
-        let emailSuggestions = [
-            <c:forEach var="email" items="${requestScope.emailSuggestions}">
-            "${email}",
-            </c:forEach>
-        ];
-        let nameSuggestions = [
-            <c:forEach var="name"  items="${requestScope.nameSuggestions}">
-            "${name}",
-            </c:forEach>
-        ]
-    </script>
   </c:otherwise>
 </c:choose>
 </body>
