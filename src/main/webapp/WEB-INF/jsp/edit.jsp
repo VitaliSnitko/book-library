@@ -18,8 +18,9 @@
   <script defer src="../../js/add-record.js"></script>
   <script defer src="../../js/suggestion-email.js"></script>
   <script defer src="../../js/file-upload-validation.js"></script>
-  <script defer src="../../js/edit-record.js"></script>
+  <script defer src="../../js/edit-record-validation.js"></script>
   <script defer src="../../js/delete-record.js"></script>
+  <script defer src="../../js/edit-record-post-ajax.js"></script>
   <title>Book page</title>
 </head>
 <body>
@@ -55,7 +56,7 @@
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
-          <form class="needs-validation record-form" action="javascript:void(0);" novalidate>
+          <form id="addModalForm" class="needs-validation record-form" action="javascript:void(0);" novalidate>
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel">Add Record</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -82,7 +83,7 @@
               </select>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-primary me-3 save-record">Save</button>
+              <button type="submit" form="addModalForm" class="btn btn-primary me-3 save-record">Save</button>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
             </div>
           </form>
@@ -122,8 +123,7 @@
               </select>
             </div>
             <div class="modal-footer">
-              <button id="editRecordModalButton" type="submit" class="btn btn-primary me-3 save-record"
-                      data-bs-dismiss="modal">Save
+              <button id="editRecordModalButton" type="submit" class="btn btn-primary me-3 save-record" data-bs-dismiss="modal">Save
               </button>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
             </div>
@@ -131,8 +131,7 @@
         </div>
       </div>
     </div>
-    <form class="needs-validation" action="edit" method="post" enctype="multipart/form-data" novalidate>
-
+    <form action="edit" id="editBookForm" class="needs-validation" enctype="multipart/form-data" novalidate>
       <input type="hidden" name="bookId" value="${bookDto.id}">
       <!-- Book -->
       <div class="container mt-4">
@@ -257,8 +256,26 @@
         </div>
         <div class="row mb-2 justify-content-center">
           <div class="col-sm-6">
-            <button class="btn btn-primary me-3" id="saveButton" type="submit">Save</button>
+            <button type="submit" class="btn btn-primary me-3" id="editBookSendAjax">Save</button>
             <a class="btn btn-secondary" href="<c:url value="/main"/>" role="button">Discard</a>
+          </div>
+        </div>
+          <%--Toast--%>
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+          <div class="toast align-items-center text-white border-0" style="background-color: #33cc85" role="alert"
+               aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#198754" class="bi bi-check"
+                     viewBox="0 0 16 16">
+                  <path
+                      d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"></path>
+                </svg>
+                Book was successfully updated!
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                      aria-label="Close"></button>
+            </div>
           </div>
         </div>
 

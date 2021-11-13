@@ -1,6 +1,6 @@
 package com.itechart.library.dao;
 
-import com.itechart.library.model.entity.Entity;
+import com.itechart.library.model.entity.BaseEntity;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,7 +11,7 @@ import java.util.Optional;
  * Methods that assume {@link Connection} parameter are serve
  * for managing transactions
  */
-public interface Dao<T extends Entity> {
+public interface Dao<T extends BaseEntity> {
 
     T create(T entity, Connection connection) throws SQLException;
 

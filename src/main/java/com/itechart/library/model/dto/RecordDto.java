@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecordDto extends Dto {
+public class RecordDto extends BaseDto {
 
     LocalDate borrowDate;
     LocalDate dueDate;

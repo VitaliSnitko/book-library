@@ -17,6 +17,7 @@ import lombok.extern.log4j.Log4j;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Log4j
 public class BookEditAction implements Action {
@@ -29,28 +30,29 @@ public class BookEditAction implements Action {
     private final RecordConverter recordConverter = new RecordConverterImpl();
 
     @Override
-    public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
+    public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         if (!bookValidator.isValid(req)) {
             log.warn("Non valid book parameters caught");
-            return new ActionResult(ActionConstants.BOOK_EDIT_SOURCE, OperationAfterAction.REDIRECT);
+            return new ActionResult(ActionConstants.BOOK_LIST_SOURCE, OperationAfterAction.REDIRECT);
         }
 
         BookDto bookDto = bookConverter.toDtoFromReq(req);
         bookService.update(bookDto);
 
         updateRecords(req);
+        resp.setContentType("text/plain");
+        resp.getWriter().write("book updated");
 
         if (recordsWereAdded(req)) {
             if (readerValidator.isValid(req)) {
                 createReaderRecords(req, bookDto);
             } else {
                 log.warn("Non valid reader parameters caught");
-                return new ActionResult(ActionConstants.BOOK_EDIT_SOURCE, OperationAfterAction.REDIRECT);
+                return new ActionResult(ActionConstants.BOOK_LIST_SOURCE, OperationAfterAction.REDIRECT);
             }
         }
-
-        return new ActionResult(ActionConstants.BOOK_LIST_SOURCE, OperationAfterAction.REDIRECT);
+        return new ActionResult(OperationAfterAction.NONE);
     }
 
     private void updateRecords(HttpServletRequest req) {

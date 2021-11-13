@@ -12,6 +12,7 @@ public class BookFormValidator implements Validator {
     @Override
     public boolean isValid(HttpServletRequest req) {
         return req.getParameter("title") != null
+                && !req.getParameter("title").isBlank()
                 && req.getParameter("authors") != null
                 && req.getParameter("genres") != null
                 && req.getParameter("publisher") != null
@@ -19,7 +20,6 @@ public class BookFormValidator implements Validator {
                 && req.getParameter("pageCount") != null
                 && req.getParameter("ISBN") != null
                 && req.getParameter("totalBookAmount") != null
-                && !req.getParameter("title").isBlank()
                 && req.getParameter("authors").matches(AUTHORS_PATTERN)
                 && req.getParameter("genres").matches(GENRES_PATTERN)
                 && !req.getParameter("publisher").isBlank()

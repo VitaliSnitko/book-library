@@ -20,6 +20,7 @@ import java.io.IOException;
 @MultipartConfig(maxFileSize = 2_097_152)
 public class FrontController extends HttpServlet {
 
+    private static final String UTF_8 = "UTF-8";
     private ActionFactory actionFactory;
 
     @Override
@@ -29,7 +30,7 @@ public class FrontController extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding(UTF_8);
         Action action = actionFactory.getAction(req);
         doOperationAfterAction(action.execute(req, resp), req, resp);
     }

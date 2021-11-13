@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Dto {
+public abstract class BaseDto {
 
     private int id;
 }

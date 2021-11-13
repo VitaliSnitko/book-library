@@ -5,7 +5,9 @@ let suggBox = document.getElementsByClassName("autocom-box")[0];
 let timeout = null;
 
 function sendAjax(actualEmailInput) {
+    console.log(actualEmailInput);
     $.ajax({
+        type: "get",
         url: "autocomplete",
         data: {
             input: actualEmailInput
@@ -29,7 +31,6 @@ emailAddInput.onkeyup = (e) => {
     clearTimeout(timeout);
     if (actualEmailInput.length > 0) {
         timeout = setTimeout(function () {
-            console.log(actualEmailInput);
             sendAjax(actualEmailInput);
         }, 1000);
     } else {
