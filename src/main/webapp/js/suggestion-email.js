@@ -18,7 +18,12 @@ function sendAjax(actualEmailInput) {
             suggBox.innerHTML = emails.join('');
             let allList = suggBox.querySelectorAll("li");
             for (let i = 0; i < allList.length; i++) {
-                allList[i].setAttribute("onclick", "select(" + readers[i] + ")");
+                allList[i].addEventListener("click", function select() {
+                    emailAddInput.value = readers[i].email;
+                    nameAddInput.value = readers[i].name;
+                    searchWrapper.classList.remove("active");
+                    disableAddButtonIfReaderAlreadyHasThisBook();
+                });
             }
         }
     })
@@ -39,12 +44,6 @@ emailAddInput.onkeyup = (e) => {
 }
 
 nameAddInput.onkeyup = () => {
-    disableAddButtonIfReaderAlreadyHasThisBook();
-}
-
-function select(reader) {
-    nameAddInput.value = reader.name;
-    searchWrapper.classList.remove("active");
     disableAddButtonIfReaderAlreadyHasThisBook();
 }
 

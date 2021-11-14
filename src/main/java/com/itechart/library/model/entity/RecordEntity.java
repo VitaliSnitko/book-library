@@ -13,7 +13,7 @@ import java.sql.Date;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecordEntity extends Entity {
+public class RecordEntity extends BaseEntity {
 
     Date borrowDate;
     Date dueDate;

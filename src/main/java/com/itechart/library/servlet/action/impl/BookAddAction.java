@@ -24,7 +24,7 @@ public class BookAddAction implements Action {
     public ActionResult execute(HttpServletRequest req, HttpServletResponse resp) {
         if (bookValidator.isValid(req)) {
             bookService.create(bookConverter.toDtoFromReq(req));
-            return new ActionResult(ActionConstants.BOOK_LIST_SOURCE);
+            return new ActionResult(ActionConstants.BOOK_LIST_SOURCE, OperationAfterAction.REDIRECT);
         } else {
             log.warn("Invalid book parameters caught");
             return new ActionResult(ActionConstants.BOOK_ADD_SOURCE, OperationAfterAction.REDIRECT);

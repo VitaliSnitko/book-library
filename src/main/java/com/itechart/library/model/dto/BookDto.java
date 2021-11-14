@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookDto extends Dto {
+public class BookDto extends BaseDto {
 
     private String title;
     private List<AuthorDto> authorDtos;

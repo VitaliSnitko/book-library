@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReaderDto extends Dto {
+public class ReaderDto extends BaseDto {
 
     String email;
     String name;

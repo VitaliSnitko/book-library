@@ -193,7 +193,7 @@ public class ReaderServiceImpl implements ReaderService {
     //this method is only for manual testing
     private Date getDate() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, 30);
+        calendar.add(Calendar.SECOND, 5);
         return new Date(calendar.getTime().getTime());
     }
 

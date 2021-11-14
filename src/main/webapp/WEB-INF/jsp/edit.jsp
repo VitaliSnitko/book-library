@@ -55,7 +55,7 @@
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
-          <form class="needs-validation record-form" action="javascript:void(0);" novalidate>
+          <form id="addRecordForm" class="needs-validation record-form" action="javascript:void(0);" novalidate>
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel">Add Record</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -82,7 +82,7 @@
               </select>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-primary me-3 save-record">Save</button>
+              <button type="submit" form="addRecordForm" class="btn btn-primary me-3 save-record">Save</button>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
             </div>
           </form>

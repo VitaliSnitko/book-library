@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class GenreEntity extends Entity {
+public class GenreEntity extends BaseEntity {
 
     private String name;
 }

@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class GenreDto extends Dto {
+public class GenreDto extends BaseDto {
 
     private String name;
 }

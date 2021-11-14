@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookEntity extends Entity {
+public class BookEntity extends BaseEntity {
 
     private String title;
     private List<AuthorEntity> authorEntities;

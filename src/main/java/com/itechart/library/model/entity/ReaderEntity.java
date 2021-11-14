@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReaderEntity extends Entity {
+public class ReaderEntity extends BaseEntity {
 
     String email;
     String name;

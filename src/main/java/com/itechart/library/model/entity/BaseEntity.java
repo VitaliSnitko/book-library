@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class Entity {
+public abstract class BaseEntity {
 
     private int id;
 }
