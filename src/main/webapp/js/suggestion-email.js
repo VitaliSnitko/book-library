@@ -36,7 +36,7 @@ emailAddInput.onkeyup = (e) => {
         timeout = setTimeout(function () {
             console.log(actualEmailInput);
             sendAjax(actualEmailInput);
-        }, 1000);
+        }, 300);
     } else {
         searchWrapper.classList.remove("active"); //hide autocomplete box
     }
